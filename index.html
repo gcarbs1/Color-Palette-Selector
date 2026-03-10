@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Palette Explorer</title>
+    <meta
+      name="description"
+      content="Explore color palettes in a modern and minimal local interface."
+    />
+
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&amp;family=DM+Serif+Display:ital@0;1&amp;display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f7f6f3;
+        --white: #ffffff;
+        --surface: #fafaf8;
+        --border: #e8e7e3;
+        --border2: #d5d4cf;
+        --text: #0e0e0d;
+        --sub: #6a6a66;
+        --muted: #aeaea9;
+        --faint: #c8c8c3;
+        --green: #152e5e;
+        --green-bg: #f0f4fd;
+        --green-m: #1647a3;
+        --green-lt: #d1ddfa;
+        --green-ring: rgba(22, 71, 163, 0.15);
+        --amber-bg: #fffbeb;
+        --amber: #92400e;
+        --red: #991b1b;
+        --radius-sm: 8px;
+        --radius: 12px;
+        --radius-lg: 18px;
+        --sh-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --sh: 0 1px 4px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
+        --sh-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+        --sh-green: 0 4px 20px rgba(22, 71, 163, 0.2);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 68px;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Outfit", sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        min-height: 100vh;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background:
+          radial-gradient(ellipse 70% 50% at 15% 10%, rgba(22, 71, 163, 0.05) 0%, transparent 60%),
+          radial-gradient(ellipse 50% 40% at 85% 90%, rgba(22, 71, 163, 0.04) 0%, transparent 60%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .progress-bar-wrap {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: transparent;
+        z-index: 60;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--green-m), #4a7dde);
+        width: 100%;
+        border-radius: 0 2px 2px 0;
+        box-shadow: 0 0 8px rgba(22, 71, 163, 0.5);
+      }
+
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 55;
+        background: rgba(255, 255, 255, 0.95);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .nav-inner {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 24px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .brand {
+        text-decoration: none;
+        color: var(--text);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+      }
+
+      .brand-logo {
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+        filter: drop-shadow(0 2px 6px rgba(21, 46, 94, 0.25));
+      }
+
+      .spacer {
+        flex: 1;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+
+      .nav-links .link {
+        color: var(--sub);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: background 0.15s, color 0.15s;
+      }
+
+      .nav-links .link:hover {
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .nav-toggle {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        margin-left: 4px;
+      }
+
+      .nav-toggle span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: var(--text);
+        border-radius: 2px;
+      }
+
+      .hero {
+        background: var(--white);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .hero-inner {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 80px 24px 64px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 48px;
+      }
+
+      .eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text);
+        margin-bottom: 18px;
+      }
+
+      .hero h1 {
+        font-family: "DM Serif Display", serif;
+        font-size: clamp(40px, 6vw, 76px);
+        font-weight: 400;
+        letter-spacing: -0.03em;
+        line-height: 0.95;
+        color: var(--text);
+      }
+
+      .lede {
+        margin-top: 20px;
+        color: var(--sub);
+        font-size: 15px;
+        font-weight: 300;
+        line-height: 1.75;
+        max-width: 520px;
+      }
+
+      .palette-pill {
+        margin-top: 18px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        border: 1px solid #c4d8ff;
+        background: var(--green-bg);
+        color: var(--text);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .palette-pill .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: var(--green-m);
+        box-shadow: 0 0 0 4px var(--green-ring);
+      }
+
+      .hero-logo {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+      }
+
+      .wc-mark {
+        width: min(320px, 40vw);
+        display: block;
+        filter: drop-shadow(0 10px 26px rgba(21, 46, 94, 0.22));
+      }
+
+      .wc-mark g {
+        scale: 0;
+        animation: wcPopup 1s forwards;
+        transform-origin: center;
+        animation-timing-function: cubic-bezier(0.27, 1.24, 0.64, 1);
+      }
+
+      .wc-mark path {
+        animation: wcPulse 2s infinite;
+        transform-origin: center;
+        animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+        stroke: rgba(255, 255, 255, 0.6);
+        stroke-miterlimit: 10;
+        stroke-width: 5px;
+      }
+
+      @keyframes wcPopup {
+        0% {
+          scale: 0;
+        }
+        100% {
+          scale: 1;
+        }
+      }
+
+      @keyframes wcPulse {
+        0% {
+          scale: 1;
+        }
+        25% {
+          scale: 0.975;
+        }
+        100% {
+          scale: 1;
+        }
+      }
+
+      .page {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 38px 20px 64px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .explorer-panel {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--sh);
+        overflow: hidden;
+      }
+
+      .explorer-head {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+      }
+
+      .explorer-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .frame-wrap {
+        padding: 12px;
+      }
+
+      .frame {
+        width: 100%;
+        min-height: 82vh;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: #fff;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .wc-mark g {
+          animation: none;
+          scale: 1;
+        }
+
+        .wc-mark path {
+          animation: none;
+        }
+      }
+
+      @media (max-width: 960px) {
+        .hero-inner {
+          grid-template-columns: 1fr;
+          gap: 32px;
+          padding: 60px 24px 48px;
+          text-align: center;
+        }
+
+        .lede {
+          max-width: 100%;
+          margin-inline: auto;
+        }
+
+        .palette-pill {
+          margin-inline: auto;
+        }
+
+        .hero-logo {
+          order: -1;
+        }
+
+        .wc-mark {
+          width: min(240px, 60vw);
+        }
+      }
+
+      @media (max-width: 640px) {
+        .nav-inner {
+          padding: 0 16px;
+          height: 52px;
+        }
+
+        .brand {
+          font-size: 13px;
+        }
+
+        .nav-links {
+          display: none;
+          position: absolute;
+          top: 52px;
+          left: 12px;
+          right: 12px;
+          background: var(--white);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          box-shadow: var(--sh-md);
+          padding: 8px;
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .nav-links.open {
+          display: flex;
+        }
+
+        .nav-toggle {
+          display: flex;
+        }
+
+        .hero-inner {
+          padding: 48px 16px 40px;
+        }
+
+        .page {
+          padding: 28px 16px 48px;
+        }
+
+        .frame {
+          min-height: 74vh;
+        }
+
+      }
+    </style>
+  </head>
+  <body>
+    <div class="progress-bar-wrap" aria-hidden="true">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <header class="hero" id="top">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">Data visualization palettes</div>
+          <h1>Color Palette<br />Selector</h1>
+          <p class="lede">
+            Explore palettes in real time. The local selector below updates the page palette instantly as soon as you choose a new palette.
+          </p>
+          <div class="palette-pill"><span class="dot"></span><span id="paletteLabel">PALETTE: DEFAULT</span></div>
+        </div>
+    <div class="hero-logo" aria-hidden="true">
+      <svg class="wc-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1362.46 1296.72">
+          <g style="animation-delay:900ms" data-name="2024">
+            <path style="animation-delay:450ms" d="M791.76,32.38c422.52,11.88,633.23,478.73,470.7,839.92-194.67,495.18-906.05,492.26-1121.96,15.09-119.76-224.9-37.62-503.68,136.27-676.11C398.97,69.74,611.09,18.21,791.76,32.38" fill="#0f1b3f"></path>
+          </g>
+          <g style="animation-delay:880ms" data-name="2023">
+            <path style="animation-delay:440ms" d="M721.03,202.47c133.86,21.87,265.29,47.82,380.34,128.01,122.74,57.53,97.77,219.8,91.77,329.26-15.29,73.25-34.69,237.73-80.04,299.25-41.85,45.73-117.23,181.67-178.31,204.19-231.99,133.41-257.94,112.42-504.45,35.93-101.26-57.13-314.09-130.49-339.03-261.39-5.74-59.93-68.62-243.84-47.99-302.23,50.11-232.98,36.68-302.09,224.75-473.51,116.33-139.01,321.28,9.99,452.97,40.49" fill="#101e44"></path>
+          </g>
+          <g style="animation-delay:860ms" data-name="2022">
+            <path style="animation-delay:430ms" d="M705.79,186.99l234.58,82.82,225.76,140.54c14.21,245.15,25.57,257.59-75.66,487.88-165.97,182.1-150.96,168.86-384.69,242.06,0,.01-217.11-88.11-217.11-88.11l-180.55-146.46-98.95-229.59,135.69-208.38c144.15-244.52,95.47-192.69,360.92-280.75" fill="#112049"></path>
+          </g>
+          <g style="animation-delay:840ms" data-name="2021">
+            <path style="animation-delay:420ms" d="M705.79,201.96c98,60.76,293.53,185.43,389.02,249.56,50.86,222.32,51.6,225.32-4.34,446.71.01,0-178.8,134.5-178.8,134.5l-205.89,90.1-219.61-66.33-195.34-140.8-86.65-239.57c74.11-252.5,66.93-242.75,254.56-427.92-.01,0,247.05-46.25,247.05-46.25" fill="#13234d"></path>
+          </g>
+          <g style="animation-delay:820ms" data-name="2020">
+            <path style="animation-delay:410ms" d="M762.91,81.12c50.61,21.98,245.63,37.09,274.74,93.13,150.04,189.89,174.26,227.42,223.36,466.88,16.41,50.37-83.61,288.98-127.49,316.94-165.56,115.86-194.53,137.33-399.5,157.96-89.73.19-448.63-147.07-465.19-241.2-3.8-12.96-49.64-203.5-47.37-210.73,9.82-76.89-41.66-264.87,62.02-299.52,25.06-10.43,189.81-81.28,205.92-98.26,60.17-38.41,185.95-219.62,273.51-185.2" fill="#142652"></path>
+          </g>
+          <g style="animation-delay:800ms" data-name="2019">
+            <path style="animation-delay:400ms" d="M719.89,187.71c34.21,12.76,231.16,44.22,257.73,66.38,71.24,50.49,235.28,104.02,236.18,211.98.4,59.13,38.23,195.64,5.02,250.01-69.73,168.65-105.01,226.86-247.41,344.25-36.09,42.45-169.78,59.5-219.15,77.5-62.83,24.84-184.73-40.57-244.4-55.72-46.18-9.21-147.59-122.48-184.43-149.74-38.91-26.9-84.62-164.28-107.7-203.93-42.71-69.93,28.24-216.08,41.06-286.73,3.02-31.75,96.08-160.83,109.94-190.56,62.65-114.95,249.26-65.47,353.15-63.44" fill="#152857"></path>
+          </g>
+          <g style="animation-delay:780ms" data-name="2018">
+            <path style="animation-delay:390ms" d="M705.79,201.96c264.36,57.1,229.97,39.91,419.27,232.1,0-.01,59.87,242.06,59.87,242.06l-94.45,222.11c-158.27,132.54-184.72,149.3-384.71,204.62,0,.01-199.64-80.93-199.64-80.93l-146.15-146.15-130.86-199.64,89.79-223.35,137.3-208.89,249.56-41.91" fill="#162a5b"></path>
+          </g>
+          <g style="animation-delay:760ms" data-name="2017">
+            <path style="animation-delay:380ms" d="M705.79,137.08c335.66,41.78,262.6,10.07,494.91,253.31,0-.01-5.78,285.73-5.78,285.73l-63.37,245.81c-102.19,54.09-314.58,145.66-425.77,175.93,0,.01-217.11-45.68-217.11-45.68l-156.78-160.19-105.25-215.87c38.17-119.98,150.46-341.55,222.11-445.21-.01,0,257.03-93.83,257.03-93.83" fill="#172d5f"></path>
+          </g>
+          <g style="animation-delay:740ms" data-name="2016">
+            <path style="animation-delay:370ms" d="M743.99,83.47c57.53,16.79,279.52.92,315.84,62.4,24.04,42.44,192.18,200.18,187.41,252.84-3.64,46.82,43.76,266.27,12.92,305.84-29.02,38.96-95.14,223.64-145.11,240.81-118.68,59.09-305.69,181.04-440.83,183.49-213.99-34.75-212.98-41.24-352.21-204.2-28.53-20.59-66.44-195.73-81.14-226.85-16.41-28.89,18.28-204.11,17.33-236.94,9.95-94.22,392.89-380.99,485.8-377.39" fill="#182f64"></path>
+          </g>
+          <g style="animation-delay:720ms" data-name="2015">
+            <path style="animation-delay:360ms" d="M710.1,223.03c183.88,45.3,224.02,39.32,360.94,183.89,65.25,46.46,14.46,205.77,16.58,269.21-18.74,186.87-1.38,204.28-156.96,326.54-77.81,57.02-378.24,64.86-456.51,7.54,0-.01-126.92-111.07-126.92-111.07-16.03-6.34-110.6-167.55-123.81-182.11-43.03-49.28,13.02-176.35,34.83-249.62,7.38-24.82,16.81-49.04,28.68-72.05,128.18-248.47,120.77-230.41,423.16-172.32" fill="#193268"></path>
+          </g>
+          <g style="animation-delay:700ms" data-name="2014">
+            <path style="animation-delay:350ms" d="M740.06,273.57c9.52,4.86,139.25,112.09,145.51,110.75,45.38,30.26,180.24,62.2,186.52,130.15,1.9,28.9,41.96,153.44,31.74,180.7-17.43,50.56-14.08,185.94-75.3,210.38-21.76,7.93-137.63,82.49-159.25,82.36-21.03.5-159.38,34.57-177.57,28.41-35.88-9.48-163.67-7.6-191.18-36.46-137.76-99.89-143.01-106-186.51-271.02-22.8-47.47,56.18-171.61,68.45-215.65,33.95-47.75,74.73-201.19,145.91-208.81,52.48-4.22,165.86-56.19,211.68-10.82" fill="#1a346c"></path>
+          </g>
+          <g style="animation-delay:680ms" data-name="2013">
+            <path style="animation-delay:340ms" d="M705.79,239.4l192.16,103.89,140.67,140.67,11.56,192.16-39.65,175.94-120.06,143.92-184.67-12.91c-173.76-8.48-180.45-19.05-306.73-96.39-17.8-10.9-29.64-29.36-31.98-50.1-6.25-55.21-18.15-160.46-18.15-160.46l.27-205.89c151.36-167.59,144.7-158.54,356.6-230.84" fill="#1b3670"></path>
+          </g>
+          <g style="animation-delay:660ms" data-name="2012">
+            <path style="animation-delay:330ms" d="M728.98,368.64c109.85,22.24,196.62,76.94,266.89,164.16,29.15,52.15,100.09,129.1,85.45,194.62-8.3,63.57-8.2,154.15-71.46,191.25-108.74,92.84-182.76,92.28-319.74,86.51-47.32-12.54-150.21-15.59-186.79-52.8-91.47-65.79-140.12-126.92-190.54-226.97-38.71-55.23-7.07-137.85,5.55-196.47,12.02-83.5,120.26-115.15,183.95-147.24,57.95-21.54,166.17-22.87,226.69-13.07" fill="#1d3975"></path>
+          </g>
+          <g style="animation-delay:640ms" data-name="2011">
+            <path style="animation-delay:320ms" d="M705.79,331.73c79.73,35.4,232.28,119.77,304.73,168.45,0,0,59.62,175.94,59.62,175.94l-81.24,163.46-114.67,128.3-128.73,61.2c-25.39,12.07-54.46,14.03-81.26,5.53-148.96-47.21-136.45-38.47-252.37-188.8-61.46-194.9-68.72-141.79,21.61-326.91,113.05-176.8,68.8-141.67,272.31-187.17" fill="#1e3c79"></path>
+          </g>
+          <g style="animation-delay:620ms" data-name="2010">
+            <path style="animation-delay:310ms" d="M844.41,250.64c84.13,7.88,155.08,71.22,213.55,126.94,66.23,52.99,82.88,144.39,93.94,223.71,16.22,72.03-16.38,146.13-47.04,209.77-60.07,127.11-215.66,186.5-348.36,195.36-108.96,8.76-225.27-36.93-306.66-108.44-150.89-119.11-166.79-398.54,31.54-478.54,131.09-59.9,188.42-214.71,363.02-168.8" fill="#203f7e"></path>
+          </g>
+          <g style="animation-delay:600ms" data-name="2009">
+            <path style="animation-delay:300ms" d="M748.75,294.67c134.12,53.6,157.13,81.92,230.53,203.49,52.81,117.63,71.09,184.18,31.4,309.61-27.51,93.74-262.23,264.58-359.54,211.63-68.23-25.76-170.2-90.88-225.86-137.94-55.1-44.49-76.21-161.27-84.76-227.55,9.26-58.22-5.68-174.47,50.24-214.34,31.16-22.13,104.65-105.73,143.53-112.78,56.08-11.79,158.24-66.68,214.46-32.13" fill="#214182"></path>
+          </g>
+          <g style="animation-delay:580ms" data-name="2008">
+            <path style="animation-delay:290ms" d="M705.79,426.56c60.62,20.02,189.28,40.59,277.7,52.2,29.39,3.86,50.3,30.51,47.02,59.97l-14.68,132.04c-.39,3.55-1.14,7.05-2.22,10.46l-39.17,123.35c-4.56,14.36-14.86,26.18-28.46,32.66l-110.99,52.88c-2.97,1.42-5.81,3.1-8.48,5.03-147.37,106.42-90.67,99.9-258.17,29.34-3.22-1.36-6.31-3.03-9.21-4.97-131.81-88.49-129.02-98.07-196.8-227.46-5.45-10.4-7.38-22.27-5.52-33.86,5.54-34.51,17.67-110.05,23.59-146.92,2.16-13.44,9.27-25.59,19.95-34.04,156.56-123.83,95.03-114.95,305.45-50.68" fill="#244586"></path>
+          </g>
+          <g style="animation-delay:560ms" data-name="2007">
+            <path style="animation-delay:280ms" d="M843.32,262.65c67.24,35.54,140.04,158.95,182.08,219.61,44.16,78.35,120.76,182.08,64.82,273.25-39.42,105.18-112.76,143.08-208.1,188.43-86.17,36.56-192.62,62.55-280.46,16.98-66.53-18.19-108.65-98.29-146.53-149.86-33.09-56.95-85.74-128.82-64.51-198.73,10.03-48.27,20.6-106.12,60.36-139.63,18.36-16.48,85.06-78.39,98.33-97.42,58.48-108.68,175.93-204.38,293.99-112.63" fill="#26488a"></path>
+          </g>
+          <g style="animation-delay:540ms" data-name="2006">
+            <path style="animation-delay:270ms" d="M712.2,314.36c77.25,3.11,198.22-14.85,243.37,67.17,24.19,40.76,76.05,98.04,74.37,148.61-1.23,41.97,16.01,135.9-3.17,174.83-43.11,102.68-85.06,278.69-220.95,284.91-95.45-1.16-234.53,17.45-309.21-54.55-56.05-49.01-119.96-140.78-151.4-208.11-42.46-61.2,2.35-161.38,15.7-225.15,94.87-206.78,132.82-218.39,351.29-187.7" fill="#294c8e"></path>
+          </g>
+          <g style="animation-delay:520ms" data-name="2005">
+            <path style="animation-delay:260ms" d="M835.08,311.22c111.38,58.71,226.72,147.26,244.16,280.48,48.17,279.18-258.16,523.96-513.5,377.02C61.18,771.45,430.3,114.97,835.08,311.22" fill="#2b4f92"></path>
+          </g>
+          <g style="animation-delay:500ms" data-name="2004">
+            <path style="animation-delay:250ms" d="M745.25,319.27c139.54,7.87,175.97,30.85,258.55,142.44,32.59,32.56,35.15,101.6,44.1,143.92,19.88,78.96-57.71,141.09-106.81,189.71-84.95,133.04-124.91,110.52-262.57,90.32-91.7,18.4-208.61-15.69-257.51-99.72-44.54-72.02-62.24-141.19-47.96-225.56-1.8-87.2,100.09-129.3,162.48-166.28,53.49-21.11,149.41-86.01,209.71-74.81" fill="#2e5396"></path>
+          </g>
+          <g style="animation-delay:480ms" data-name="2003">
+            <path style="animation-delay:240ms" d="M782.35,309.28c204.09,115.17,364.63,509.36,59.44,602.41-107.53,60.61-257.11,93.72-359.87,5.92-134.67-93.92-169.21-261.48-74.3-397.24,8.43-18.13,32.37-85.43,38.88-105.52,43.44-135.01,222.92-190.54,335.85-105.58" fill="#33589a"></path>
+          </g>
+          <g style="animation-delay:460ms" data-name="2002">
+            <path style="animation-delay:230ms" d="M577.63,371.8c186.12-170.03,538.68,31.33,468.61,280.26-5.84,150.92-56.16,289.05-219.36,326.41-111.15,37.4-226.99-9.33-314.95-78.66-139.35-101.83-144.67-339.66-18.16-453.7,19.98-16.79,64.19-58.01,83.86-74.3" fill="#375c9e"></path>
+          </g>
+          <g style="animation-delay:440ms" data-name="2001">
+            <path style="animation-delay:220ms" d="M705.79,451.52l162.21-56.36c47.17,66.63,129.72,207.19,164.7,280.97,0,0-104.3,128.51-104.3,128.51l-106.56,72.48-116.04,21.11-123.53-8.15c-79.93-111.71-80-74.82-56.15-213.96-10.95-127.24-10.76-101.12,63.64-200.99,0,0,116.04-23.61,116.04-23.61" fill="#3c62a2"></path>
+          </g>
+          <g style="animation-delay:420ms" data-name="2000">
+            <path style="animation-delay:210ms" d="M723.31,394.28c152.08,62.49,294.35,114.31,278.81,309.25,2.99,109.97-70.4,183.3-166.13,224.09-97.6,58.39-229.34,56.15-310.73-29.56-65.96-53.82-96.32-148.31-115.35-228.07-85.17-245.17,87.03-366.35,313.39-275.71" fill="#4066a6"></path>
+          </g>
+          <g style="animation-delay:400ms" data-name="1999">
+            <path style="animation-delay:200ms" d="M705.79,386.63l125.53-15.18c29.29-3.54,55.46,18.46,56.99,47.92l7.17,137.4c.33,6.3,1.83,12.49,4.41,18.24l37.24,82.8c5.33,11.85,5.92,25.28,1.68,37.56-28.33,82.04-44.41,109.04-104.36,174.99-6.56,7.22-15.06,12.39-24.48,14.91-22.12,5.93-64.43,17.27-87.75,23.51-10.67,2.86-21.97,2.17-32.21-1.96l-89.49-36.04c-3.84-1.55-7.47-3.55-10.82-5.98l-74.04-53.55c-12.35-8.93-20.05-22.93-20.99-38.14l-5.68-91.91c-.21-3.39-.08-6.79.39-10.15l14.31-102.99c.74-5.3,2.3-10.45,4.64-15.26l48.41-99.62c5.95-12.25,16.56-21.6,29.45-25.98l119.6-40.59" fill="#456baa"></path>
+          </g>
+          <g style="animation-delay:380ms" data-name="1998">
+            <path style="animation-delay:190ms" d="M746.06,312.9c182.67-21.01,258.96,139.78,323.36,279.66,116.35,262.59-143.87,493.7-403.46,438.84-224.3-34.25-270.35-307.78-182.77-483.8,28.43-126.33,133.26-222.01,262.87-234.7" fill="#4c71ae"></path>
+          </g>
+          <g style="animation-delay:360ms" data-name="1997">
+            <path style="animation-delay:180ms" d="M705.79,444.03c101.2,3.81,137.77,15.15,201.27,46.19,37.21,18.19,57.2,59.44,48.08,99.85-14.43,63.95-29.66,142.88-35.99,194.36-1.16,9.47-3.76,18.66-7.82,27.3-7.26,15.47-19.7,41.98-31.12,66.3-15.65,33.33-50.15,53.63-86.88,51.13l-87.54-5.97c-135.77-13.4-138.13-18.98-234.34-85.59-13.63-9.44-24.39-22.55-31.04-37.74-55.52-126.78-50.86-134.16-36.1-266.2,2.16-19.31,10.52-37.42,23.89-51.52,16.62-17.53,40.51-42.75,61.09-64.46,25.23-26.63,64.18-35.1,98.2-21.37l118.3,47.73" fill="#5378b2"></path>
+          </g>
+          <g style="animation-delay:340ms" data-name="1996">
+            <path style="animation-delay:170ms" d="M705.79,439.04c181.58-16.88,125.79-46.88,218.28,111.06,0,0,3.82,126.02,3.82,126.02l-49.21,99.82-71.83,75.24c-108.1,69.79-106.64,60.88-217.55,60.48-11.39-.04-21.27-7.96-23.7-19.09l-26.24-120.37,4.2-96.08-66.88-132.26c110.19-117.69,66.31-101.71,229.09-104.82" fill="#5a7fb7"></path>
+          </g>
+          <g style="animation-delay:320ms" data-name="1995">
+            <path style="animation-delay:160ms" d="M765.92,340.55c171.19-8.68,156.24,136.59,209.94,248.41,44.37,82.7-11.02,159.42-60.16,223.67-29.67,76.96-93.09,134.7-178.85,133.89-102.43,7.8-191.92-44.46-233.87-138.37-30.82-60.24-65.43-133.74-39.36-201.74,13.04-75.96,91.62-100.39,140.62-147.29,42.11-45.76,92.58-116.94,161.68-118.55" fill="#6185bb"></path>
+          </g>
+          <g style="animation-delay:300ms" data-name="1994">
+            <path style="animation-delay:150ms" d="M705.79,454.01c77.34,127.87,27.86,111.66,181.54,117.28,82.75,130.82,83.47,78.98-2.16,208.38-77.28,110.26-45.01,91.84-179.38,103.56-79.72-69.32-96.96-70.48-196.67-93.57,0,0-22.94-113.55-22.94-113.55l1.33-126.03,88.52-98.74,129.77,2.66" fill="#688cbf"></path>
+          </g>
+          <g style="animation-delay:280ms" data-name="1993">
+            <path style="animation-delay:140ms" d="M705.79,419.07l128.52,34.44c65.78,91.15,78.69,110.92,101.06,222.61,0,0-32.92,113.54-32.92,113.54-96.37,71.56-73.57,72.6-196.67,63.63,0,0-82.35-34.54-82.35-34.54-17.63-90.34-15.54-83.64-84.85-142.64l48.33-68.63,5.32-128.04,113.55-60.37" fill="#7092c3"></path>
+          </g>
+          <g style="animation-delay:260ms" data-name="1992">
+            <path style="animation-delay:130ms" d="M705.79,379.14c138.46,51.03,139.81,48.3,239.89,158.48,0,0-45.24,138.5-45.24,138.5-13.03,119.28-1.66,97.41-94.84,172.89-38.99-14.55-125.05-47.43-160.95-67,0,0-8.02-65.97-8.02-65.97-32.56-40.6-29.19-43.53-23.77-93.58,0,0,.6-106.27.6-106.27l92.33-137.05" fill="#7899c8"></path>
+          </g>
+          <g style="animation-delay:240ms" data-name="1991">
+            <path style="animation-delay:120ms" d="M788,376.23c84,9.86,125.28,93.83,155.53,162.63,40.06,63.59,74.59,144.77,31.65,215.97-52.96,98.91-86.1,230.14-226.35,217.47-143.66-9.27-278.86-140.62-240.61-291.09,2.75-136.07,127.26-328.16,279.79-304.99" fill="#809fcc"></path>
+          </g>
+          <g style="animation-delay:220ms" data-name="1990">
+            <path style="animation-delay:110ms" d="M753.66,406.55c36.95,15.9,90.1,40.26,130.47,42.48,116.39,15.33,188.36,136.86,155.27,247.54-16.05,105.23-87.75,176.05-191.8,195.38-71.82,36.09-153.9,66.33-229.44,20.64-70.57-43.08-195.77-215.29-182.31-300.81-2.77-156.68,178.02-261.09,317.81-205.24" fill="#88a6d1"></path>
+          </g>
+          <g style="animation-delay:200ms" data-name="1989">
+            <path style="animation-delay:100ms" d="M705.79,531.37l107.77-60.38c9.18-5.14,20.71-3.13,27.6,4.83,66.32,76.57,72.43,86.49,96.66,189.45,1.61,6.83-.11,14.01-4.63,19.37-16.72,19.82-57.58,68.28-67.46,79.99-1.41,1.68-3.06,3.12-4.9,4.31-39.07,25.19-104.58,80.9-143.08,117.61-7.22,6.89-18.15,8.09-26.71,2.95-45.77-27.46-116.58-73.05-157.99-102.28-5.55-3.92-9.01-10.15-9.37-16.94-1.15-21.34-3.7-68.85-4.67-86.96-.25-4.68.99-9.32,3.54-13.26l43.52-67.06c2.33-3.59,3.57-7.77,3.57-12.05l.11-108.98c.02-17.71,19.77-28.26,34.49-18.42l101.55,67.82" fill="#90add5"></path>
+          </g>
+          <g style="animation-delay:180ms" data-name="1988">
+            <path style="animation-delay:90ms" d="M795.14,430.9c51.25,60.39,168.73,61.54,179.96,154.76,16.36,84.1,27.17,213.79-52.47,269.47-117.9,104.64-457.12,80.54-420.58-130.56,5.9-71.54,100.42-94.08,93.14-170.93-19.68-108.53,112.67-204.09,199.95-122.75" fill="#9ab4d9"></path>
+          </g>
+          <g style="animation-delay:160ms" data-name="1987">
+            <path style="animation-delay:80ms" d="M705.79,429.06c118.74,1.25,139.84,92.82,179.18,181.21,29.8,35.97,45.42,82.74,36.27,129.23-16.47,129.14-180.38,254.5-292.23,145.03-62.18-52.62-136.97-98.53-123.03-193.03,14.53-119.75,39.2-287.76,199.81-262.44" fill="#a4bcde"></path>
+          </g>
+          <g style="animation-delay:140ms" data-name="1986">
+            <path style="animation-delay:70ms" d="M705.79,468.98l114.8,8.3c38.41,45.45,101.63,145.08,127.27,198.84,0,0-36.75,118.53-36.75,118.53-48.08,4.55-158.45,16.58-205.31,21.21,0,0-72.37-14.4-72.37-14.4-13.22-30.11-31.78-92.26-29.94-125.35-42.77-93.66-31.78-74.35,7.49-164.25,0,0,94.82-42.88,94.82-42.88" fill="#afc5e2"></path>
+          </g>
+          <g style="animation-delay:120ms" data-name="1985">
+            <path style="animation-delay:60ms" d="M705.79,463.99c64.51,128.13,11.42,120.5,142.64,129.77,34.04,85.97,32.56,80.43,6.48,168.45,0,0-76.74,39.25-76.74,39.25-82.85-28.15-75.45-19.35-152.23,12.97-14.63-61.86-27.9-75.62,0-138.32,0,0-21.73-58.65-21.73-58.65,19.4-78.52,49.56-99.1,101.58-153.48" fill="#b9cde7"></path>
+          </g>
+          <g style="animation-delay:100ms" data-name="1984">
+            <path style="animation-delay:50ms" d="M705.79,456.51c77.92,83.27,73.92,82.83,172.61,105.72,9.77,2.27,16.03,11.81,14.23,21.67-18.2,99.39-6.45,110.96,26.4,192.5,5.37,13.34-5.6,27.53-19.86,25.65-76.92-10.14-181.65-27.11-251.63-7.02-7.87,2.26-16.29-.92-20.78-7.77-9.55-14.55-24.94-38-29.72-45.28-.97-1.48-1.73-3.09-2.25-4.79l-15.44-50.25c-2.05-6.66-.24-13.91,4.7-18.82l36.01-35.84c2.36-2.35,4.05-5.28,4.9-8.49l15.25-57.45c.46-1.73,1.16-3.38,2.08-4.9l63.49-104.93" fill="#c3d5eb"></path>
+          </g>
+          <g style="animation-delay:80ms" data-name="1983">
+            <path style="animation-delay:40ms" d="M778.96,384.75c60.48,12.74,117.19,64.21,155.59,110.1,46.91,41.04,19.25,132.67,20.89,185.62,28.8,179.68-108.87,192.2-249.66,187.8-96.19,8.94-218.26-29.78-168.97-150.01,14.18-24.96,17.45-54.92,7.99-82.13-25.47-64.61,29.58-105.56,69.6-145.28,34.75-55.55,86.07-140.42,164.56-106.11" fill="#cbdbee"></path>
+          </g>
+          <g style="animation-delay:60ms" data-name="1982">
+            <path style="animation-delay:30ms" d="M705.79,523.89l44.48-4.69c27.25-2.87,51.77,16.64,55.08,43.84l5.16,42.27c.75,6.16,3.18,11.99,7,16.88,26.26,33.68,38.47,65.57,47.66,101.65,7.36,28.91-6.83,58.98-33.76,71.8-42.18,20.07-93.03,45.32-123.26,61.41-1.41.75-3.14.53-4.31-.56-11.21-10.34-66.67-61.5-66.67-61.5-51.19-48.03-52.63-47.5-60.71-115.28-.27-2.24-.32-4.52-.13-6.77,2.95-35.03-.24-109.56-3.62-168.65-1.58-27.59,28.6-45.49,52.05-30.87l81.03,50.48" fill="#d4e1f1"></path>
+          </g>
+          <g style="animation-delay:40ms" data-name="1981">
+            <path style="animation-delay:20ms" d="M775.37,400.22c82.62,40.51,199.24,91.41,201.66,198.35,25.1,167.35-140.48,324.51-306.18,290.29-138.79-27.64-145.2-192.4-124.99-305.08-1.91-125,99.66-244.25,229.51-183.56" fill="#dce7f3"></path>
+          </g>
+          <g style="animation-delay:20ms" data-name="1980">
+            <path style="animation-delay:10ms" d="M786.14,424.24c113.65,14.8,215.58,202.57,198.79,308.88-8.6,85.57-89.93,125.51-165.6,139.66-56.48,22.81-124.19,39.02-178.4,1.55-105.66-57.01-128.6-275.13-30.93-348.17,44-54.55,98.12-115.68,176.14-101.92" fill="#e5edf6"></path>
+          </g>
+          <g style="animation-delay:0ms" data-name="1979">
+            <path style="animation-delay:0ms" d="M716.65,476.22c47.75,174.71,182.02,16.44,137.66,246.52-2.19,26.47-27.01,44.23-46.37,58.93-32.84,30-77.38-.69-114.53,4.6-53.98,19.96-113.41-4.13-144.37-51.2-43.72-65.44-30.87-102.88-15.86-173.88,2.15-57.04,6.95-169.28,94.58-138.97,27.31,12.4,77.72,21.32,88.88,54Z" fill="#ecf3f9"></path>
+          </g>
+      </svg>
+    </div>
+      </div>
+    </header>
+
+    <main class="page">
+      <section id="explorar" class="explorer-panel" aria-label="Explorador de paletas">
+        <div class="explorer-head">
+          <span class="explorer-title">Palette Explorer</span>
+        </div>
+
+        <div class="frame-wrap">
+          <iframe
+            id="paletteFrame"
+            class="frame"
+            title="Palette explorer"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            sandbox="allow-same-origin allow-scripts allow-top-navigation allow-modals"
+            allow="clipboard-write"
+            src="./palette-explorer.html?language=r"
+          ></iframe>
+        </div>
+
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        const TOOL_BASE = "./palette-explorer.html";
+        const frame = document.getElementById("paletteFrame");
+        const palettePill = document.querySelector(".palette-pill");
+        const paletteDot = palettePill ? palettePill.querySelector(".dot") : null;
+        const paletteLabel = document.getElementById("paletteLabel");
+
+        const wcPaths = Array.from(document.querySelectorAll(".wc-mark path"));
+        wcPaths.forEach((path) => {
+          path.dataset.originalFill = path.getAttribute("fill") || "#0f1b3f";
+        });
+
+        const PRESET_BASES = {
+          viridis: ["#440154", "#238a8d", "#fde725"],
+          magma: ["#0b0826", "#b73779", "#fcfdbf"],
+          plasma: ["#0d0887", "#cc4778", "#f0f921"],
+          inferno: ["#09080d", "#bc3754", "#fcffa4"],
+          turbo: ["#30123b", "#33b1ff", "#f9f871"],
+          spectral: ["#9e0142", "#fdae61", "#5e4fa2"],
+          set1: ["#e41a1c", "#377eb8", "#4daf4a"],
+          set2: ["#66c2a5", "#fc8d62", "#8da0cb"]
+        };
+
+        function normalizeLanguage(value) {
+          return value === "python" ? "python" : "r";
+        }
+
+        function readPageState() {
+          const params = new URLSearchParams(window.location.search);
+          return {
+            language: normalizeLanguage(params.get("language") || "r"),
+            palette: (params.get("palette") || "").trim()
+          };
+        }
+
+        function buildToolUrl(state) {
+          const params = new URLSearchParams();
+          params.set("language", normalizeLanguage(state.language));
+          if (state.palette) {
+            params.set("palette", state.palette);
+          }
+          return `${TOOL_BASE}?${params.toString()}`;
+        }
+
+        function parseStateFromUrl(rawUrl) {
+          try {
+            const parsed = new URL(rawUrl, window.location.href);
+            return {
+              language: normalizeLanguage(parsed.searchParams.get("language") || "r"),
+              palette: (parsed.searchParams.get("palette") || "").trim()
+            };
+          } catch (_) {
+            return { language: "r", palette: "" };
+          }
+        }
+
+        function writePageState(state) {
+          const url = new URL(window.location.href);
+          url.searchParams.set("language", normalizeLanguage(state.language || "r"));
+          if (state.palette) {
+            url.searchParams.set("palette", state.palette);
+          } else {
+            url.searchParams.delete("palette");
+          }
+          history.replaceState({}, "", url);
+        }
+
+        function hexToRgb(hex) {
+          const clean = hex.replace("#", "");
+          const full = clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean;
+          return {
+            r: parseInt(full.slice(0, 2), 16),
+            g: parseInt(full.slice(2, 4), 16),
+            b: parseInt(full.slice(4, 6), 16)
+          };
+        }
+
+        function rgbToHex({ r, g, b }) {
+          const toHex = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0");
+          return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        }
+
+        function mixColor(a, b, t) {
+          const c1 = hexToRgb(a);
+          const c2 = hexToRgb(b);
+          return rgbToHex({
+            r: c1.r + (c2.r - c1.r) * t,
+            g: c1.g + (c2.g - c1.g) * t,
+            b: c1.b + (c2.b - c1.b) * t
+          });
+        }
+
+        function hashString(text) {
+          let hash = 0;
+          for (let i = 0; i < text.length; i += 1) {
+            hash = (hash << 5) - hash + text.charCodeAt(i);
+            hash |= 0;
+          }
+          return Math.abs(hash);
+        }
+
+        function hslToHex(h, s, l) {
+          const sat = s / 100;
+          const light = l / 100;
+          const c = (1 - Math.abs(2 * light - 1)) * sat;
+          const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+          const m = light - c / 2;
+          let r = 0;
+          let g = 0;
+          let b = 0;
+
+          if (h < 60) {
+            r = c;
+            g = x;
+          } else if (h < 120) {
+            r = x;
+            g = c;
+          } else if (h < 180) {
+            g = c;
+            b = x;
+          } else if (h < 240) {
+            g = x;
+            b = c;
+          } else if (h < 300) {
+            r = x;
+            b = c;
+          } else {
+            r = c;
+            b = x;
+          }
+
+          return rgbToHex({ r: (r + m) * 255, g: (g + m) * 255, b: (b + m) * 255 });
+        }
+
+        function generateBaseColors(name) {
+          const seed = hashString(name || "default");
+          const base = seed % 360;
+          return [
+            hslToHex(base, 70, 24),
+            hslToHex((base + 45) % 360, 76, 42),
+            hslToHex((base + 90) % 360, 80, 84)
+          ];
+        }
+
+        function buildRamp(baseColors, count) {
+          const [dark, mid, light] = baseColors;
+          const colors = [];
+          for (let i = 0; i < count; i += 1) {
+            const t = count <= 1 ? 0 : i / (count - 1);
+            if (t < 0.5) {
+              colors.push(mixColor(dark, mid, t * 2));
+            } else {
+              colors.push(mixColor(mid, light, (t - 0.5) * 2));
+            }
+          }
+          return colors;
+        }
+
+        function normalizeColorArray(colors) {
+          if (!Array.isArray(colors)) return [];
+          return colors
+            .map((color) => String(color || "").trim())
+            .filter((color) => /^#[0-9a-f]{6,8}$/i.test(color));
+        }
+
+        function resetPalettePillTheme() {
+          if (!palettePill || !paletteDot) return;
+          palettePill.style.background = "var(--green-bg)";
+          palettePill.style.borderColor = "#c4d8ff";
+          palettePill.style.color = "var(--text)";
+          paletteDot.style.background = "var(--green-m)";
+          paletteDot.style.boxShadow = "0 0 0 4px var(--green-ring)";
+        }
+
+        function applyPalettePillTheme(colors) {
+          if (!palettePill || !paletteDot) return;
+          const validColors = normalizeColorArray(colors);
+          if (!validColors.length) {
+            resetPalettePillTheme();
+            return;
+          }
+
+          const base = validColors[0];
+          const accent = validColors[Math.min(1, validColors.length - 1)] || base;
+          const bg = mixColor(base, "#ffffff", 0.82);
+          const border = mixColor(accent, "#ffffff", 0.58);
+          const rgb = hexToRgb(accent);
+
+          palettePill.style.background = bg;
+          palettePill.style.borderColor = border;
+          palettePill.style.color = "var(--text)";
+          paletteDot.style.background = accent;
+          paletteDot.style.boxShadow = `0 0 0 4px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.24)`;
+        }
+
+        function buildRampFromPalette(colors, count) {
+          if (!colors.length) return [];
+          if (colors.length === 1) {
+            return Array.from({ length: count }, () => colors[0]);
+          }
+
+          const ramp = [];
+          const maxIndex = colors.length - 1;
+          for (let i = 0; i < count; i += 1) {
+            const t = count <= 1 ? 0 : i / (count - 1);
+            const position = t * maxIndex;
+            const left = Math.floor(position);
+            const right = Math.min(maxIndex, left + 1);
+            const localT = position - left;
+            ramp.push(mixColor(colors[left], colors[right], localT));
+          }
+          return ramp;
+        }
+
+        function applyPaletteToLogo(paletteName) {
+          const key = (paletteName || "").toLowerCase();
+
+          if (!key) {
+            wcPaths.forEach((path) => {
+              path.style.fill = path.dataset.originalFill;
+            });
+            resetPalettePillTheme();
+            paletteLabel.textContent = "PALETTE: DEFAULT";
+            return;
+          }
+
+          const baseColors = PRESET_BASES[key] || generateBaseColors(key);
+          const ramp = buildRamp(baseColors, wcPaths.length);
+
+          wcPaths.forEach((path, idx) => {
+            path.style.fill = ramp[idx];
+          });
+
+          applyPalettePillTheme(baseColors);
+          paletteLabel.textContent = `PALETTE: ${key.toUpperCase()}`;
+        }
+
+        function applyPaletteToLogoWithColors(paletteName, paletteColors) {
+          const colors = normalizeColorArray(paletteColors);
+          if (!colors.length) {
+            applyPaletteToLogo(paletteName);
+            return;
+          }
+
+          const ramp = buildRampFromPalette(colors, wcPaths.length);
+          wcPaths.forEach((path, idx) => {
+            path.style.fill = ramp[idx] || colors[0];
+          });
+
+          applyPalettePillTheme(colors);
+          paletteLabel.textContent = `PALETTE: ${String(paletteName || "CUSTOM").toUpperCase()}`;
+        }
+
+        function syncFromFrameSrc(srcValue) {
+          const state = parseStateFromUrl(srcValue || frame.getAttribute("src") || frame.src);
+          applyPaletteToLogo(state.palette);
+          writePageState(state);
+        }
+
+        const pageState = readPageState();
+        frame.src = buildToolUrl(pageState);
+        syncFromFrameSrc(frame.src);
+
+        window.addEventListener("message", (event) => {
+          if (event.source !== frame.contentWindow) return;
+          const data = event.data || {};
+          if (data.type !== "palette-change") return;
+
+          const nextState = {
+            language: normalizeLanguage(data.language || pageState.language),
+            palette: String(data.paletteName || "").trim()
+          };
+
+          applyPaletteToLogoWithColors(nextState.palette, data.colors);
+          writePageState(nextState);
+        });
+
+        frame.addEventListener("load", () => {
+          let bestUrl = frame.getAttribute("src") || frame.src;
+          try {
+            bestUrl = frame.contentWindow.location.href || bestUrl;
+          } catch (_) {
+            // Cross-origin iframe: not readable.
+          }
+          syncFromFrameSrc(bestUrl);
+        });
+
+        const observer = new MutationObserver(() => {
+          syncFromFrameSrc(frame.getAttribute("src"));
+        });
+
+        observer.observe(frame, { attributes: true, attributeFilter: ["src"] });
+      })();
+    </script>
+  </body>
+</html>
