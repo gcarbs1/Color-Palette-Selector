@@ -254,12 +254,60 @@
         justify-content: center;
         align-items: center;
         pointer-events: none;
+        position: relative;
+        --hero-glow: rgba(21, 46, 94, 0.22);
+        --hero-bg-main: rgba(22, 71, 163, 0.16);
+        --hero-bg-fade: rgba(22, 71, 163, 0.02);
+        --hero-halo-width: min(430px, 52vw);
+        --hero-halo-height: min(300px, 36vw);
+      }
+
+      .hero-logo::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: var(--hero-halo-width);
+        height: var(--hero-halo-height);
+        transform: translate(-50%, -50%);
+        background: radial-gradient(
+            ellipse 56% 46% at 36% 52%,
+            var(--hero-bg-main) 0%,
+            rgba(0, 0, 0, 0) 74%
+          ),
+          radial-gradient(
+            ellipse 50% 42% at 66% 48%,
+            var(--hero-bg-fade) 0%,
+            rgba(0, 0, 0, 0) 76%
+          ),
+          radial-gradient(
+            ellipse 44% 36% at 52% 30%,
+            rgba(255, 255, 255, 0.08) 0%,
+            rgba(255, 255, 255, 0) 78%
+          );
+        filter: blur(18px);
+        opacity: 0.96;
+        transition:
+          background 0.2s ease,
+          filter 0.2s ease,
+          opacity 0.2s ease;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      @media (max-width: 1200px) {
+        .hero-logo::before {
+          filter: blur(14px);
+        }
       }
 
       .wc-mark {
         width: min(320px, 40vw);
         display: block;
-        filter: drop-shadow(0 10px 26px rgba(21, 46, 94, 0.22));
+        filter: drop-shadow(0 10px 26px var(--hero-glow));
+        transition: filter 0.2s ease;
+        position: relative;
+        z-index: 1;
       }
 
       .wc-mark g {
@@ -341,7 +389,7 @@
         border-radius: 999px;
         border: 1px solid #c6d8ff;
         background: var(--green-bg);
-        color: var(--green-m);
+        color: var(--text);
         padding: 0 11px;
         font-size: 11px;
         font-weight: 700;
@@ -362,6 +410,11 @@
 
       .combo-wrap {
         position: relative;
+      }
+
+      .combo-wrap .control-label {
+        display: inline-block;
+        margin-bottom: 6px;
       }
 
       .combo-button {
@@ -535,28 +588,6 @@
         box-shadow: 0 0 0 4px rgba(22, 71, 163, 0.12);
       }
 
-      .meta-row {
-        margin-top: 10px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        font: 500 12px/1.2 "Outfit", sans-serif;
-        color: var(--sub);
-      }
-
-      .meta-row > span {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding-right: 10px;
-        border-right: 1px solid var(--border);
-      }
-
-      .meta-row > span:last-child {
-        border-right: none;
-        padding-right: 0;
-      }
-
       .plot-grid {
         margin-top: 16px;
         display: grid;
@@ -619,6 +650,8 @@
 
         .hero-logo {
           order: -1;
+          --hero-halo-width: min(340px, 80vw);
+          --hero-halo-height: min(240px, 56vw);
         }
 
         .wc-mark {
@@ -859,6 +892,7 @@
         <div class="workbench">
           <div class="selector-row">
             <div class="combo-wrap" id="paletteComboWrap">
+              <label class="control-label" for="paletteComboButton">Palette</label>
               <button
                 id="paletteComboButton"
                 class="combo-button"
@@ -888,7 +922,7 @@
             </div>
 
             <div class="control-group">
-              <label class="control-label" for="visionMode">Simulação de visão</label>
+              <label class="control-label" for="visionMode">Vision Simulation</label>
               <select id="visionMode" class="control-select">
                 <option value="normal">Normal</option>
                 <option value="deuteranopia">Deuteranopia</option>
@@ -897,12 +931,6 @@
                 <option value="achromatopsia">Acromatopsia</option>
               </select>
             </div>
-          </div>
-
-          <div class="meta-row">
-            <span><strong>Source:</strong> <span id="metaSource">-</span></span>
-            <span><span id="metaCount">0</span> colors</span>
-            <span id="metaKind">unknown</span>
           </div>
 
           <div class="plot-grid">
@@ -984,6 +1012,7 @@
         const palettePill = document.querySelector(".palette-pill");
         const paletteDot = palettePill ? palettePill.querySelector(".dot") : null;
         const paletteLabel = document.getElementById("paletteLabel");
+        const heroLogo = document.querySelector(".hero-logo");
         const wcPaths = Array.from(document.querySelectorAll(".wc-mark path"));
 
         const countBadge = document.getElementById("paletteCountBadge");
@@ -995,9 +1024,6 @@
         const searchInput = document.getElementById("paletteSearch");
         const optionsList = document.getElementById("paletteOptions");
         const visionMode = document.getElementById("visionMode");
-        const metaSource = document.getElementById("metaSource");
-        const metaCount = document.getElementById("metaCount");
-        const metaKind = document.getElementById("metaKind");
 
         const plotSvgs = {
           bar: document.getElementById("plot-bar"),
@@ -1182,7 +1208,51 @@
             .join("");
         }
 
+        function resetCountBadgeTheme() {
+          if (!countBadge) return;
+          countBadge.style.background = "var(--green-bg)";
+          countBadge.style.borderColor = "#c6d8ff";
+          countBadge.style.color = "var(--text)";
+        }
+
+        function applyCountBadgeTheme(colors) {
+          if (!countBadge) return;
+          if (!colors.length) {
+            resetCountBadgeTheme();
+            return;
+          }
+
+          const base = colors[0];
+          const accent = colors[Math.min(1, colors.length - 1)] || base;
+          countBadge.style.background = mixColor(base, "#ffffff", 0.84);
+          countBadge.style.borderColor = mixColor(accent, "#ffffff", 0.56);
+          countBadge.style.color = "var(--text)";
+        }
+
+        function resetHeroLogoTheme() {
+          if (!heroLogo) return;
+          heroLogo.style.setProperty("--hero-glow", "rgba(21, 46, 94, 0.22)");
+          heroLogo.style.setProperty("--hero-bg-main", "rgba(22, 71, 163, 0.16)");
+          heroLogo.style.setProperty("--hero-bg-fade", "rgba(22, 71, 163, 0.02)");
+        }
+
+        function applyHeroLogoTheme(colors) {
+          if (!heroLogo) return;
+          if (!colors.length) {
+            resetHeroLogoTheme();
+            return;
+          }
+
+          const base = hexToRgb(colors[0]);
+          const accent = hexToRgb(colors[Math.min(1, colors.length - 1)] || colors[0]);
+          heroLogo.style.setProperty("--hero-glow", `rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.34)`);
+          heroLogo.style.setProperty("--hero-bg-main", `rgba(${base.r}, ${base.g}, ${base.b}, 0.20)`);
+          heroLogo.style.setProperty("--hero-bg-fade", `rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.03)`);
+        }
+
         function resetPalettePillTheme() {
+          resetCountBadgeTheme();
+          resetHeroLogoTheme();
           if (!palettePill || !paletteDot) return;
           palettePill.style.background = "var(--green-bg)";
           palettePill.style.borderColor = "#c4d8ff";
@@ -1195,11 +1265,15 @@
         }
 
         function applyPalettePillTheme(colors) {
-          if (!palettePill || !paletteDot) return;
           if (!colors.length) {
             resetPalettePillTheme();
             return;
           }
+
+          applyCountBadgeTheme(colors);
+          applyHeroLogoTheme(colors);
+
+          if (!palettePill || !paletteDot) return;
 
           const base = colors[0];
           const accent = colors[Math.min(1, colors.length - 1)] || base;
@@ -1268,9 +1342,6 @@
           if (!selected) {
             comboName.textContent = "Nenhuma paleta";
             comboSwatches.innerHTML = "";
-            metaSource.textContent = "-";
-            metaCount.textContent = "0";
-            metaKind.textContent = "unknown";
             resetPalettePillTheme();
             return;
           }
@@ -1278,9 +1349,6 @@
           const displayColors = getDisplayPaletteColors(selected);
           comboName.textContent = selected.name;
           comboSwatches.innerHTML = renderSwatchesHtml(displayColors, 10);
-          metaSource.textContent = selected.source || "source not available";
-          metaCount.textContent = String(selected.palette.length);
-          metaKind.textContent = selected.kind || "unknown";
 
           applyPaletteToLogoWithColors(selected.name, displayColors);
         }
@@ -1735,9 +1803,6 @@
           countBadge.textContent = "Erro";
           comboName.textContent = "Falha ao carregar";
           comboSwatches.innerHTML = "";
-          metaSource.textContent = String(error && error.message ? error.message : error || "Erro desconhecido");
-          metaCount.textContent = "0";
-          metaKind.textContent = "error";
           optionsList.innerHTML =
             '<div style="padding:12px;color:#6a6a66;font-size:12px;">Erro ao carregar as paletas locais. Rode <code>python3 -m http.server 8000</code> e abra via http://localhost:8000.</div>';
           renderEmptyPlots("Sem dados");
