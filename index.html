@@ -811,6 +811,7 @@
       width: 100%;
       height: auto;
       cursor: crosshair;
+      touch-action: none;
     }
 
     .ps-canvas.hovering { cursor: pointer; }
@@ -2029,6 +2030,13 @@
         let spaceDragStartY  = 0;
         let spaceDragPanX    = 0;
         let spaceDragPanY    = 0;
+        let spaceTouchPinching      = false;
+        let spaceTouchMoved         = false;
+        let spaceTouchHadPinch      = false;
+        let spaceTouchStartDistance = 0;
+        let spaceTouchStartZoom     = 1;
+        let spaceTouchAnchorWorldX  = 0;
+        let spaceTouchAnchorWorldY  = 0;
 
         async function loadCoordsData() {
           if (!psCanvas) return;
@@ -2158,6 +2166,19 @@
           };
         }
 
+        function touchDistance(t1, t2) {
+          const dx = t1.clientX - t2.clientX;
+          const dy = t1.clientY - t2.clientY;
+          return Math.hypot(dx, dy);
+        }
+
+        function touchMidpoint(t1, t2) {
+          return {
+            x: (t1.clientX + t2.clientX) / 2,
+            y: (t1.clientY + t2.clientY) / 2,
+          };
+        }
+
         function findSpaceHit(clientX, clientY) {
           if (!psCanvas || !spacePoints.length) return -1;
           const { cx, cy } = canvasCoords(clientX, clientY);
@@ -2272,6 +2293,146 @@
               selectPalette(spacePoints[idx].rec.name);
               if (psTooltip) psTooltip.hidden = true;
             }
+          });
+
+          // touch support: pan (1 finger), pinch zoom (2 fingers), tap to select
+          psCanvas.addEventListener("touchstart", (e) => {
+            if (!e.touches.length) return;
+
+            if (psTooltip) psTooltip.hidden = true;
+            spaceHovered = -1;
+            psCanvas.classList.remove("hovering");
+
+            if (e.touches.length === 1) {
+              const touch = e.touches[0];
+              spaceIsDragging = true;
+              spaceTouchPinching = false;
+              spaceTouchHadPinch = false;
+              spaceTouchMoved = false;
+              spaceDragStartX = touch.clientX;
+              spaceDragStartY = touch.clientY;
+              spaceDragPanX = spacePanX;
+              spaceDragPanY = spacePanY;
+              psCanvas.classList.add("dragging");
+            } else if (e.touches.length >= 2) {
+              const t1 = e.touches[0];
+              const t2 = e.touches[1];
+              const dist = touchDistance(t1, t2);
+              if (dist > 0) {
+                const center = touchMidpoint(t1, t2);
+                const { cx, cy } = canvasCoords(center.x, center.y);
+                spaceIsDragging = false;
+                spaceTouchPinching = true;
+                spaceTouchHadPinch = true;
+                spaceTouchMoved = true;
+                spaceTouchStartDistance = dist;
+                spaceTouchStartZoom = spaceZoom;
+                spaceTouchAnchorWorldX = (cx - spacePanX) / spaceZoom;
+                spaceTouchAnchorWorldY = (cy - spacePanY) / spaceZoom;
+                psCanvas.classList.add("dragging");
+              }
+            }
+
+            e.preventDefault();
+          }, { passive: false });
+
+          psCanvas.addEventListener("touchmove", (e) => {
+            if (!e.touches.length) return;
+
+            if (spaceTouchPinching && e.touches.length >= 2) {
+              const t1 = e.touches[0];
+              const t2 = e.touches[1];
+              const dist = touchDistance(t1, t2);
+              if (spaceTouchStartDistance > 0 && dist > 0) {
+                const center = touchMidpoint(t1, t2);
+                const { cx, cy } = canvasCoords(center.x, center.y);
+                const factor = dist / spaceTouchStartDistance;
+                spaceZoom = Math.max(0.35, Math.min(25, spaceTouchStartZoom * factor));
+                spacePanX = cx - spaceTouchAnchorWorldX * spaceZoom;
+                spacePanY = cy - spaceTouchAnchorWorldY * spaceZoom;
+                drawPaletteSpace();
+              }
+              e.preventDefault();
+              return;
+            }
+
+            if (spaceIsDragging && e.touches.length === 1) {
+              const touch = e.touches[0];
+              const rect = psCanvas.getBoundingClientRect();
+              const scaleX = psCanvas.width / rect.width;
+              const scaleY = psCanvas.height / rect.height;
+              const deltaX = touch.clientX - spaceDragStartX;
+              const deltaY = touch.clientY - spaceDragStartY;
+
+              if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
+                spaceTouchMoved = true;
+              }
+
+              spacePanX = spaceDragPanX + deltaX * scaleX;
+              spacePanY = spaceDragPanY + deltaY * scaleY;
+              drawPaletteSpace();
+              e.preventDefault();
+            }
+          }, { passive: false });
+
+          psCanvas.addEventListener("touchend", (e) => {
+            if (e.touches.length >= 2) {
+              const t1 = e.touches[0];
+              const t2 = e.touches[1];
+              const dist = touchDistance(t1, t2);
+              if (dist > 0) {
+                const center = touchMidpoint(t1, t2);
+                const { cx, cy } = canvasCoords(center.x, center.y);
+                spaceTouchPinching = true;
+                spaceTouchStartDistance = dist;
+                spaceTouchStartZoom = spaceZoom;
+                spaceTouchAnchorWorldX = (cx - spacePanX) / spaceZoom;
+                spaceTouchAnchorWorldY = (cy - spacePanY) / spaceZoom;
+              }
+              e.preventDefault();
+              return;
+            }
+
+            if (e.touches.length === 1) {
+              const touch = e.touches[0];
+              spaceIsDragging = true;
+              spaceTouchPinching = false;
+              spaceTouchStartDistance = 0;
+              spaceDragStartX = touch.clientX;
+              spaceDragStartY = touch.clientY;
+              spaceDragPanX = spacePanX;
+              spaceDragPanY = spacePanY;
+              psCanvas.classList.add("dragging");
+              e.preventDefault();
+              return;
+            }
+
+            psCanvas.classList.remove("dragging");
+            spaceIsDragging = false;
+            spaceTouchPinching = false;
+            spaceTouchStartDistance = 0;
+
+            const endedTouch = e.changedTouches && e.changedTouches[0] ? e.changedTouches[0] : null;
+            const shouldSelect = endedTouch && !spaceTouchMoved && !spaceTouchHadPinch;
+            if (shouldSelect) {
+              const idx = findSpaceHit(endedTouch.clientX, endedTouch.clientY);
+              if (idx >= 0) {
+                selectPalette(spacePoints[idx].rec.name);
+              }
+            }
+
+            spaceTouchMoved = false;
+            spaceTouchHadPinch = false;
+            e.preventDefault();
+          }, { passive: false });
+
+          psCanvas.addEventListener("touchcancel", () => {
+            spaceIsDragging = false;
+            spaceTouchPinching = false;
+            spaceTouchMoved = false;
+            spaceTouchHadPinch = false;
+            spaceTouchStartDistance = 0;
+            psCanvas.classList.remove("dragging");
           });
 
           // zoom buttons
