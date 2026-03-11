@@ -8,7 +8,9 @@ Versao local (sem dependencia de iframe externo) para explorar paletas e sincron
 .
 ├── data/
 │   ├── palettes.json
-│   └── palettes.js
+│   ├── palettes.js
+│   └── source/
+│       └── dataviz-color-finder-page.js
 ├── index.html
 ├── palette-explorer.html
 ├── scripts/
@@ -31,7 +33,8 @@ Versao local (sem dependencia de iframe externo) para explorar paletas e sincron
 
 ## Como as fontes sao extraidas
 
-- Origem: build publico do projeto `dataviz-color-finder`.
+- Origem inicial: build publico do projeto `dataviz-color-finder`.
+- Snapshot local versionado: `data/source/dataviz-color-finder-page.js`.
 - Script: `scripts/extract_palettes.py`
 - Saida: `data/palettes.json` e `data/palettes.js`
 - Campos extraidos por paleta: `name`, `palette`, `source`, `kind`
@@ -39,8 +42,13 @@ Versao local (sem dependencia de iframe externo) para explorar paletas e sincron
 Para regenerar:
 
 ```bash
-python3 -m venv .venv
-.venv/bin/python scripts/extract_palettes.py
+python3 scripts/extract_palettes.py
+```
+
+Para atualizar o snapshot local da fonte e regenerar:
+
+```bash
+python3 scripts/extract_palettes.py --refresh-source
 ```
 
 Notebook de apoio: `notebooks/extract_palettes.ipynb`.
