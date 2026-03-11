@@ -721,6 +721,94 @@
         }
 
       }
+    }
+
+    /* ── Palette Space ─────────────────────────────────────────────────────── */
+    .ps-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ps-tool-btn {
+      height: 26px;
+      min-width: 26px;
+      padding: 0 8px;
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      color: var(--sub);
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s, border-color 0.12s;
+      line-height: 1;
+    }
+
+    .ps-tool-btn:hover {
+      background: var(--green-bg);
+      color: var(--green-m);
+      border-color: var(--green-lt);
+    }
+
+    .ps-wrap {
+      position: relative;
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    .ps-canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      cursor: crosshair;
+    }
+
+    .ps-canvas.hovering { cursor: pointer; }
+    .ps-canvas.dragging { cursor: grabbing !important; }
+
+    .ps-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--sh-md);
+      padding: 10px 12px;
+      min-width: 160px;
+      max-width: 240px;
+      z-index: 10;
+    }
+
+    .ps-tooltip-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ps-tooltip-swatches {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 5px;
+      flex-wrap: wrap;
+    }
+
+    .ps-tooltip-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .ps-tooltip-meta {
+      font-size: 11px;
+      color: var(--sub);
+    }
     </style>
   </head>
   <body>
@@ -973,8 +1061,24 @@
           </div>
         </div>
       </section>
+
+      <section id="palette-space" class="explorer-panel" aria-label="Palette similarity map">
+        <div class="explorer-head">
+          <span class="explorer-title">Palette Space</span>
+          <div class="ps-toolbar">
+            <button type="button" class="ps-tool-btn" id="psZoomOut" title="Zoom out">−</button>
+            <button type="button" class="ps-tool-btn" id="psZoomReset" title="Reset view">Reset</button>
+            <button type="button" class="ps-tool-btn" id="psZoomIn" title="Zoom in">+</button>
+          </div>
+        </div>
+        <div class="ps-wrap" id="psWrap">
+          <canvas id="psCanvas" class="ps-canvas"></canvas>
+          <div id="psTooltip" class="ps-tooltip" hidden></div>
+        </div>
+      </section>
     </main>
 
+    <script src="./data/palette_coords.js"></script>
     <script src="./data/palettes.js"></script>
     <script>
       (function () {
@@ -1732,6 +1836,7 @@
           renderSelection();
           renderOptions();
           renderPlots();
+          drawPaletteSpace();
         }
 
         function bindEvents() {
@@ -1809,6 +1914,309 @@
           resetPalettePillTheme();
         }
 
+        // ── Palette Space ──────────────────────────────────────────────────────
+        const COORDS_URL = "./data/palette_coords.json";
+
+        const SPACE_KIND_COLORS = {
+          qualitative : "#4e79a7",
+          sequential  : "#f28e2b",
+          diverging   : "#e15759",
+          cyclic      : "#76b7b2",
+          ""          : "#bab0ac",
+        };
+
+        const psCanvas  = document.getElementById("psCanvas");
+        const psTooltip = document.getElementById("psTooltip");
+        const psWrap    = document.getElementById("psWrap");
+
+        let spaceData        = [];
+        let spacePoints      = [];
+        let spaceHovered     = -1;
+        let spaceZoom        = 1;
+        let spacePanX        = 0;
+        let spacePanY        = 0;
+        let spaceIsDragging  = false;
+        let spaceDragStartX  = 0;
+        let spaceDragStartY  = 0;
+        let spaceDragPanX    = 0;
+        let spaceDragPanY    = 0;
+
+        async function loadCoordsData() {
+          if (!psCanvas) return;
+          let raw;
+          try {
+            const resp = await fetch(COORDS_URL, { cache: "force-cache" });
+            if (!resp.ok) throw new Error("fetch failed");
+            raw = await resp.json();
+          } catch (_) {
+            if (Array.isArray(window.__PALETTE_COORDS__) && window.__PALETTE_COORDS__.length) {
+              raw = window.__PALETTE_COORDS__;
+            } else {
+              return;
+            }
+          }
+          spaceData = raw;
+        }
+
+        function computeSpacePoints() {
+          const W   = psCanvas ? (psCanvas.width  || 800) : 800;
+          const H   = psCanvas ? (psCanvas.height || 450) : 450;
+          const pad = 32;
+          spacePoints = spaceData.map((rec) => ({
+            px: pad + (rec.x + 1) / 2 * (W - 2 * pad),
+            py: pad + (1 - (rec.y + 1) / 2) * (H - 2 * pad),
+            rec,
+          }));
+        }
+
+        // map a base canvas point through current zoom+pan to screen coords
+        function toScreen(px, py) {
+          return { sx: px * spaceZoom + spacePanX, sy: py * spaceZoom + spacePanY };
+        }
+
+        function drawPaletteSpace() {
+          if (!psCanvas || !spaceData.length) return;
+          const W = psCanvas.offsetWidth || 800;
+          const H = Math.round(W * 0.56);
+          psCanvas.width  = W;
+          psCanvas.height = H;
+
+          computeSpacePoints();
+
+          const ctx     = psCanvas.getContext("2d");
+          const selName = state.selectedName.toLowerCase();
+          ctx.clearRect(0, 0, W, H);
+
+          // faint background grid (fixed, not zoomed)
+          ctx.strokeStyle = "rgba(0,0,0,0.035)";
+          ctx.lineWidth   = 1;
+          for (let i = 0; i <= 4; i++) {
+            const gx = 32 + (i / 4) * (W - 64);
+            const gy = 32 + (i / 4) * (H - 64);
+            ctx.beginPath(); ctx.moveTo(gx, 32); ctx.lineTo(gx, H - 32); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(32, gy); ctx.lineTo(W - 32, gy); ctx.stroke();
+          }
+
+          const BASE_R  = Math.max(2.5, W / 240);
+          const scaledR = Math.min(BASE_R * spaceZoom, BASE_R * 5);
+
+          // regular points
+          for (let i = 0; i < spacePoints.length; i++) {
+            const sp = spacePoints[i];
+            if (sp.rec.name.toLowerCase() === selName) continue;
+            if (i === spaceHovered) continue;
+            const { sx, sy } = toScreen(sp.px, sp.py);
+            if (sx < -scaledR || sx > W + scaledR || sy < -scaledR || sy > H + scaledR) continue;
+            const color = sp.rec.colors && sp.rec.colors[0]
+              ? (normalizeHex(sp.rec.colors[0]) || "#888")
+              : (SPACE_KIND_COLORS[sp.rec.kind] || SPACE_KIND_COLORS[""]);
+            ctx.globalAlpha = 0.72;
+            ctx.fillStyle   = color;
+            ctx.beginPath();
+            ctx.arc(sx, sy, scaledR, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          // hovered point
+          if (spaceHovered >= 0 && spaceHovered < spacePoints.length) {
+            const sp    = spacePoints[spaceHovered];
+            const { sx, sy } = toScreen(sp.px, sp.py);
+            const color = sp.rec.colors && sp.rec.colors[0]
+              ? (normalizeHex(sp.rec.colors[0]) || "#888")
+              : (SPACE_KIND_COLORS[sp.rec.kind] || SPACE_KIND_COLORS[""]);
+            ctx.globalAlpha = 1;
+            ctx.fillStyle   = color;
+            ctx.beginPath(); ctx.arc(sx, sy, scaledR * 1.9, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth   = 2;
+            ctx.globalAlpha = 0.85;
+            ctx.beginPath(); ctx.arc(sx, sy, scaledR * 1.9 + 1.5, 0, Math.PI * 2); ctx.stroke();
+          }
+
+          // selected point — always on top, fixed visual size regardless of zoom
+          const selIdx = spacePoints.findIndex((sp) => sp.rec.name.toLowerCase() === selName);
+          if (selIdx >= 0) {
+            const sp    = spacePoints[selIdx];
+            const { sx, sy } = toScreen(sp.px, sp.py);
+            const color = sp.rec.colors && sp.rec.colors[0]
+              ? (normalizeHex(sp.rec.colors[0]) || "#1647a3")
+              : "#1647a3";
+            const SR  = Math.max(scaledR * 2.6, BASE_R * 2.6);
+            const rgb = hexToRgb(color);
+            ctx.globalAlpha = 0.2;
+            ctx.strokeStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},1)`;
+            ctx.lineWidth   = SR;
+            ctx.beginPath(); ctx.arc(sx, sy, SR + SR * 0.65, 0, Math.PI * 2); ctx.stroke();
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth   = 2.5;
+            ctx.beginPath(); ctx.arc(sx, sy, SR + 3, 0, Math.PI * 2); ctx.stroke();
+            ctx.strokeStyle = "rgba(0,0,0,0.28)";
+            ctx.lineWidth   = 1.5;
+            ctx.beginPath(); ctx.arc(sx, sy, SR + 4.5, 0, Math.PI * 2); ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.beginPath(); ctx.arc(sx, sy, SR, 0, Math.PI * 2); ctx.fill();
+          }
+
+          ctx.globalAlpha = 1;
+        }
+
+        function canvasCoords(clientX, clientY) {
+          const rect   = psCanvas.getBoundingClientRect();
+          return {
+            cx: (clientX - rect.left) * (psCanvas.width  / rect.width),
+            cy: (clientY - rect.top)  * (psCanvas.height / rect.height),
+          };
+        }
+
+        function findSpaceHit(clientX, clientY) {
+          if (!psCanvas || !spacePoints.length) return -1;
+          const { cx, cy } = canvasCoords(clientX, clientY);
+          const THRESHOLD  = 10; // fixed 10 screen-px regardless of zoom
+          let best = -1, bestDist = Infinity;
+          for (let i = 0; i < spacePoints.length; i++) {
+            const { sx, sy } = toScreen(spacePoints[i].px, spacePoints[i].py);
+            const dx = sx - cx, dy = sy - cy;
+            const d  = Math.sqrt(dx * dx + dy * dy);
+            if (d < THRESHOLD && d < bestDist) { bestDist = d; best = i; }
+          }
+          return best;
+        }
+
+        function showSpaceTooltip(idx, clientX, clientY) {
+          if (!psTooltip || !psWrap) return;
+          if (idx < 0) { psTooltip.hidden = true; return; }
+          const rec      = spacePoints[idx].rec;
+          const swatches = (rec.colors || []).slice(0, 14)
+            .map((c) => `<span class="ps-tooltip-swatch" style="background:${normalizeHex(c) || "#ccc"}"></span>`)
+            .join("");
+          psTooltip.innerHTML = `
+            <div class="ps-tooltip-name">${escapeHtml(rec.name)}</div>
+            <div class="ps-tooltip-swatches">${swatches}</div>
+            <div class="ps-tooltip-meta">${escapeHtml(rec.kind || "unknown")} · ${(rec.colors || []).length} colors</div>`;
+          const wrapRect = psWrap.getBoundingClientRect();
+          const tx = clientX - wrapRect.left, ty = clientY - wrapRect.top;
+          const TW = 210, TH = 90;
+          let left = tx + 16; if (left + TW > wrapRect.width)  left = tx - TW - 16;
+          let top  = ty - TH / 2; if (top < 4) top = 4; if (top + TH > wrapRect.height) top = wrapRect.height - TH - 4;
+          psTooltip.style.left = `${left}px`;
+          psTooltip.style.top  = `${top}px`;
+          psTooltip.hidden     = false;
+        }
+
+        function zoomAtPoint(cx, cy, factor) {
+          const worldX = (cx - spacePanX) / spaceZoom;
+          const worldY = (cy - spacePanY) / spaceZoom;
+          spaceZoom = Math.max(0.35, Math.min(25, spaceZoom * factor));
+          spacePanX = cx - worldX * spaceZoom;
+          spacePanY = cy - worldY * spaceZoom;
+        }
+
+        function bindSpaceEvents() {
+          if (!psCanvas) return;
+
+          // scroll to zoom
+          psCanvas.addEventListener("wheel", (e) => {
+            e.preventDefault();
+            const { cx, cy } = canvasCoords(e.clientX, e.clientY);
+            zoomAtPoint(cx, cy, e.deltaY < 0 ? 1.15 : 1 / 1.15);
+            drawPaletteSpace();
+          }, { passive: false });
+
+          // drag to pan
+          psCanvas.addEventListener("mousedown", (e) => {
+            if (e.button !== 0) return;
+            spaceIsDragging = true;
+            spaceDragStartX = e.clientX;
+            spaceDragStartY = e.clientY;
+            spaceDragPanX   = spacePanX;
+            spaceDragPanY   = spacePanY;
+            psCanvas.classList.add("dragging");
+            if (psTooltip) psTooltip.hidden = true;
+          });
+
+          window.addEventListener("mousemove", (e) => {
+            if (!spaceIsDragging) return;
+            const rect   = psCanvas.getBoundingClientRect();
+            const scaleX = psCanvas.width  / rect.width;
+            const scaleY = psCanvas.height / rect.height;
+            spacePanX = spaceDragPanX + (e.clientX - spaceDragStartX) * scaleX;
+            spacePanY = spaceDragPanY + (e.clientY - spaceDragStartY) * scaleY;
+            drawPaletteSpace();
+          });
+
+          window.addEventListener("mouseup", () => {
+            if (!spaceIsDragging) return;
+            spaceIsDragging = false;
+            psCanvas.classList.remove("dragging");
+          });
+
+          // hover
+          psCanvas.addEventListener("mousemove", (e) => {
+            if (spaceIsDragging) return;
+            const idx = findSpaceHit(e.clientX, e.clientY);
+            if (idx !== spaceHovered) { spaceHovered = idx; drawPaletteSpace(); }
+            if (idx >= 0) {
+              showSpaceTooltip(idx, e.clientX, e.clientY);
+              psCanvas.classList.add("hovering");
+            } else {
+              if (psTooltip) psTooltip.hidden = true;
+              psCanvas.classList.remove("hovering");
+            }
+          });
+
+          psCanvas.addEventListener("mouseleave", () => {
+            if (spaceIsDragging) return;
+            spaceHovered = -1;
+            if (psTooltip) psTooltip.hidden = true;
+            psCanvas.classList.remove("hovering");
+            drawPaletteSpace();
+          });
+
+          // click to select (only if not a drag)
+          psCanvas.addEventListener("click", (e) => {
+            const movedX = Math.abs(e.clientX - spaceDragStartX);
+            const movedY = Math.abs(e.clientY - spaceDragStartY);
+            if (movedX > 4 || movedY > 4) return;
+            const idx = findSpaceHit(e.clientX, e.clientY);
+            if (idx >= 0) {
+              selectPalette(spacePoints[idx].rec.name);
+              if (psTooltip) psTooltip.hidden = true;
+            }
+          });
+
+          // zoom buttons
+          document.getElementById("psZoomIn")?.addEventListener("click", () => {
+            zoomAtPoint((psCanvas.width || 800) / 2, (psCanvas.height || 450) / 2, 1.5);
+            drawPaletteSpace();
+          });
+          document.getElementById("psZoomOut")?.addEventListener("click", () => {
+            zoomAtPoint((psCanvas.width || 800) / 2, (psCanvas.height || 450) / 2, 1 / 1.5);
+            drawPaletteSpace();
+          });
+          document.getElementById("psZoomReset")?.addEventListener("click", () => {
+            spaceZoom = 1; spacePanX = 0; spacePanY = 0;
+            drawPaletteSpace();
+          });
+
+          // reset on resize
+          let resizeTimer;
+          window.addEventListener("resize", () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+              spaceZoom = 1; spacePanX = 0; spacePanY = 0;
+              drawPaletteSpace();
+            }, 150);
+          });
+        }
+
+        function initPaletteSpace() {
+          if (!psCanvas) return;
+          bindSpaceEvents();
+          drawPaletteSpace();
+        }
+
+        // ── App init ────────────────────────────────────────────────────────────
         async function init() {
           readStateFromUrl();
           visionMode.value = state.vision;
@@ -1821,11 +2229,14 @@
             return;
           }
 
+          await loadCoordsData();
+
           ensureSelectedPalette();
           writeStateToUrl();
           renderSelection();
           renderOptions();
           renderPlots();
+          initPaletteSpace();
         }
 
         init();
