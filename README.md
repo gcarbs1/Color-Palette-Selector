@@ -1,8 +1,15 @@
 # Color Palette Selector
 
-Interface local para explorar paletas de cores, visualizar exemplos de gráficos e navegar no mapa de similaridade (`Palette Space`).
+Local interface to explore color palettes, preview chart examples, and navigate the similarity map (`Palette Space`).
 
-## Estrutura
+It now includes `Palette Studio`, an area to:
+- create your own palettes with HEX colors
+- merge colors from the currently selected palette
+- save local collections in the browser (`localStorage`)
+- visualize saved palettes in `Palette Space`
+- export palettes as JSON
+
+## Structure
 
 ```
 .
@@ -22,36 +29,36 @@ Interface local para explorar paletas de cores, visualizar exemplos de gráficos
     └── palette_similarity.ipynb
 ```
 
-## Como rodar
+## Run Locally
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Abra: `http://localhost:8000`
+Open: `http://localhost:8000`
 
-## Dados de paleta
+## Palette Data
 
-- Fonte base: snapshot local em `data/source/dataviz-color-finder-page.js`
-- Extração: `scripts/extract_palettes.py`
-- Saída:
-  - `data/palettes.json` (dados principais)
-  - `data/palettes.js` (fallback para uso local)
-- Campos por paleta: `name`, `palette`, `source`, `kind`
+- Base source: local snapshot at `data/source/dataviz-color-finder-page.js`
+- Extraction: `scripts/extract_palettes.py`
+- Output:
+  - `data/palettes.json` (main data)
+  - `data/palettes.js` (local fallback)
+- Per-palette fields: `name`, `palette`, `source`, `kind`
 
-Para regenerar os arquivos:
+To regenerate files:
 
 ```bash
 python3 scripts/extract_palettes.py
 ```
 
-Para atualizar o snapshot remoto e regenerar:
+To refresh the remote snapshot and regenerate:
 
 ```bash
 python3 scripts/extract_palettes.py --refresh-source
 ```
 
-## Coordenadas do Palette Space
+## Palette Space Coordinates
 
-- `data/palette_coords.json` e `data/palette_coords.js` armazenam as coordenadas 2D e metadados das paletas.
-- O notebook `notebooks/palette_similarity.ipynb` documenta o pipeline de similaridade.
+- `data/palette_coords.json` and `data/palette_coords.js` store the 2D coordinates and palette metadata.
+- The notebook `notebooks/palette_similarity.ipynb` documents the similarity pipeline.

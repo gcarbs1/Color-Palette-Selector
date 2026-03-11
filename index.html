@@ -38,6 +38,9 @@
         --green-m: #1647a3;
         --green-lt: #d1ddfa;
         --green-ring: rgba(22, 71, 163, 0.15);
+        --studio-accent: #1647a3;
+        --studio-accent-hover: #123b87;
+        --studio-accent-text: #ffffff;
         --amber-bg: #fffbeb;
         --amber: #92400e;
         --red: #991b1b;
@@ -668,6 +671,215 @@
         color: var(--sub);
       }
 
+      .studio-body {
+        padding: 14px 16px 16px;
+        display: grid;
+        gap: 12px;
+      }
+
+      .studio-hint {
+        font-size: 12px;
+        color: var(--sub);
+      }
+
+      .studio-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        gap: 12px;
+      }
+
+      .studio-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: #fff;
+        padding: 12px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .studio-field {
+        display: grid;
+        gap: 6px;
+      }
+
+      .studio-input {
+        width: 100%;
+        border: 1px solid #d8d7d1;
+        border-radius: 10px;
+        min-height: 40px;
+        padding: 0 11px;
+        font: 500 13px/1.2 "Outfit", sans-serif;
+        color: var(--text);
+      }
+
+      .studio-input:focus {
+        outline: none;
+        border-color: #8eb0ef;
+        box-shadow: 0 0 0 4px rgba(22, 71, 163, 0.12);
+      }
+
+      .studio-color-input {
+        max-width: 180px;
+      }
+
+      .studio-inline {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .studio-btn {
+        border: 1px solid #d8d7d1;
+        border-radius: 10px;
+        min-height: 34px;
+        padding: 0 10px;
+        font: 600 12px/1 "Outfit", sans-serif;
+        color: var(--text);
+        background: #fff;
+        cursor: pointer;
+        transition: border-color 0.15s, background 0.15s, color 0.15s;
+      }
+
+      .studio-btn:hover {
+        border-color: #b9b8b0;
+        background: #f8f8f6;
+      }
+
+      .studio-btn.primary {
+        background: var(--studio-accent);
+        border-color: var(--studio-accent);
+        color: var(--studio-accent-text);
+      }
+
+      .studio-btn.primary:hover {
+        background: var(--studio-accent-hover);
+        border-color: var(--studio-accent-hover);
+      }
+
+      .studio-btn.danger {
+        color: var(--red);
+      }
+
+      .studio-draft-list {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        min-height: 30px;
+      }
+
+      .studio-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 30px;
+        padding: 0 8px 0 5px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: #fff;
+      }
+
+      .studio-chip-swatch {
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.14);
+      }
+
+      .studio-chip-code {
+        font: 600 11px/1 "Outfit", sans-serif;
+        letter-spacing: 0.02em;
+      }
+
+      .studio-chip-remove {
+        border: none;
+        background: transparent;
+        color: var(--sub);
+        cursor: pointer;
+        font-size: 14px;
+        line-height: 1;
+      }
+
+      .studio-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .studio-message {
+        font-size: 12px;
+        min-height: 18px;
+        color: var(--sub);
+      }
+
+      .studio-message.is-error {
+        color: var(--red);
+      }
+
+      .studio-message.is-success {
+        color: var(--studio-accent);
+      }
+
+      .studio-library-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .studio-library-head h3 {
+        font: 700 13px/1.2 "Outfit", sans-serif;
+        color: var(--text);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .studio-collection {
+        display: grid;
+        gap: 8px;
+        max-height: 380px;
+        overflow: auto;
+        padding-right: 2px;
+      }
+
+      .studio-palette-item {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 9px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .studio-palette-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .studio-palette-name {
+        font: 600 13px/1.2 "Outfit", sans-serif;
+        color: var(--text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .studio-palette-meta {
+        font: 500 11px/1.2 "Outfit", sans-serif;
+        color: var(--sub);
+      }
+
+      .studio-empty {
+        font-size: 12px;
+        color: var(--sub);
+        padding: 8px;
+        border: 1px dashed var(--border2);
+        border-radius: var(--radius-sm);
+        background: #fcfcfb;
+      }
+
       @media (prefers-reduced-motion: reduce) {
         .wc-mark g {
           animation: none;
@@ -712,6 +924,14 @@
 
         .plot-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .studio-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .studio-collection {
+          max-height: none;
         }
       }
 
@@ -768,8 +988,14 @@
           grid-template-columns: 1fr;
         }
 
+        .studio-color-input {
+          max-width: none;
+        }
+
+        .studio-inline .studio-btn {
+          flex: 1 1 100%;
+        }
       }
-    }
 
     /* ── Palette Space ─────────────────────────────────────────────────────── */
     .ps-toolbar {
@@ -1020,10 +1246,10 @@
     </header>
 
     <main class="page">
-      <section id="explorar" class="explorer-panel" aria-label="Explorador de paletas">
+      <section id="explore" class="explorer-panel" aria-label="Palette explorer">
         <div class="explorer-head">
           <span class="explorer-title">Palette Workbench</span>
-          <span id="paletteCountBadge" class="count-badge">Carregando...</span>
+          <span id="paletteCountBadge" class="count-badge">Loading...</span>
         </div>
 
         <div class="workbench">
@@ -1040,7 +1266,7 @@
                 aria-controls="paletteOptions"
               >
                 <div class="combo-selection">
-                  <span id="comboName" class="combo-name">Carregando...</span>
+                  <span id="comboName" class="combo-name">Loading...</span>
                   <div id="comboSwatches" class="swatch-row" aria-hidden="true"></div>
                 </div>
                 <span class="combo-chevron" aria-hidden="true">▾</span>
@@ -1051,10 +1277,10 @@
                   id="paletteSearch"
                   class="search-input"
                   type="text"
-                  placeholder="Buscar paleta (ex.: ghoststory, viridis, set2)"
+                  placeholder="Search palette (e.g. ghoststory, viridis, set2)"
                   autocomplete="off"
                 />
-                <div id="paletteOptions" class="option-list" role="listbox" aria-label="Lista de paletas"></div>
+                <div id="paletteOptions" class="option-list" role="listbox" aria-label="Palette list"></div>
               </div>
             </div>
 
@@ -1065,7 +1291,7 @@
                 <option value="deuteranopia">Deuteranopia</option>
                 <option value="protanopia">Protanopia</option>
                 <option value="tritanopia">Tritanopia</option>
-                <option value="achromatopsia">Acromatopsia</option>
+                <option value="achromatopsia">Achromatopsia</option>
               </select>
             </div>
           </div>
@@ -1111,7 +1337,7 @@
         </div>
       </section>
 
-      <section id="palette-hex" class="explorer-panel" aria-label="Palette hexadecimal values">
+      <section id="palette-hex" class="explorer-panel" aria-label="Palette hex values">
         <div class="explorer-head">
           <span class="explorer-title">Palette Hex Values</span>
           <span id="paletteHexMeta" class="count-badge">Loading...</span>
@@ -1120,6 +1346,67 @@
           <ul id="paletteHexList" class="palette-hex-list">
             <li class="palette-hex-empty">Loading palette colors...</li>
           </ul>
+        </div>
+      </section>
+
+      <section id="palette-studio" class="explorer-panel" aria-label="Palette creation studio">
+        <div class="explorer-head">
+          <span class="explorer-title">Palette Studio</span>
+          <span id="studioMeta" class="count-badge">0 saved</span>
+        </div>
+        <div class="studio-body">
+          <div class="studio-grid">
+            <div class="studio-card">
+              <div class="studio-field">
+                <label class="control-label" for="studioName">Palette name</label>
+                <input
+                  id="studioName"
+                  class="studio-input"
+                  type="text"
+                  maxlength="60"
+                  placeholder="e.g. Summer Campaign"
+                />
+              </div>
+
+              <div class="studio-field">
+                <label class="control-label" for="studioColorInput">Add color (HEX)</label>
+                <div class="studio-inline">
+                  <input
+                    id="studioColorInput"
+                    class="studio-input studio-color-input"
+                    type="text"
+                    placeholder="#1F77B4"
+                    autocomplete="off"
+                  />
+                  <button type="button" class="studio-btn" id="studioAddColor">Add color</button>
+                  <button type="button" class="studio-btn" id="studioAddCurrent">Add current palette</button>
+                </div>
+              </div>
+
+              <ul id="studioDraftList" class="studio-draft-list">
+                <li class="studio-empty">Your draft has no colors yet.</li>
+              </ul>
+
+              <div id="studioMessage" class="studio-message" role="status" aria-live="polite"></div>
+
+              <div class="studio-actions">
+                <button type="button" class="studio-btn primary" id="studioSavePalette">Save to collection</button>
+                <button type="button" class="studio-btn" id="studioExportDraft">Export JSON</button>
+                <button type="button" class="studio-btn" id="studioClearDraft">Clear draft</button>
+              </div>
+            </div>
+
+            <div class="studio-card">
+              <div class="studio-library-head">
+                <h3>My palettes</h3>
+                <button type="button" class="studio-btn danger" id="studioClearLibrary">Clear all</button>
+              </div>
+
+              <div id="studioCollection" class="studio-collection">
+                <div class="studio-empty">No saved palettes yet.</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1144,6 +1431,8 @@
     <script>
       (function () {
         const DATA_URL = "./data/palettes.json";
+        const CUSTOM_STORAGE_KEY = "palette_explorer_custom_palettes_v1";
+        const MAX_CUSTOM_COLORS = 20;
         const PAGE_SIZE = 180;
         const DEFAULT_COLORS = ["#0f1b3f", "#1647a3", "#4a7dde", "#7fa3ea", "#c8d9ff", "#ecf3f9"];
         const VISION_MATRICES = {
@@ -1191,6 +1480,18 @@
         const visionMode = document.getElementById("visionMode");
         const paletteHexMeta = document.getElementById("paletteHexMeta");
         const paletteHexList = document.getElementById("paletteHexList");
+        const studioMeta = document.getElementById("studioMeta");
+        const studioNameInput = document.getElementById("studioName");
+        const studioColorInput = document.getElementById("studioColorInput");
+        const studioAddColorBtn = document.getElementById("studioAddColor");
+        const studioAddCurrentBtn = document.getElementById("studioAddCurrent");
+        const studioDraftList = document.getElementById("studioDraftList");
+        const studioMessage = document.getElementById("studioMessage");
+        const studioSaveBtn = document.getElementById("studioSavePalette");
+        const studioExportBtn = document.getElementById("studioExportDraft");
+        const studioClearBtn = document.getElementById("studioClearDraft");
+        const studioCollection = document.getElementById("studioCollection");
+        const studioClearLibraryBtn = document.getElementById("studioClearLibrary");
 
         const plotSvgs = {
           bar: document.getElementById("plot-bar"),
@@ -1205,12 +1506,16 @@
         };
 
         const state = {
+          basePalettes: [],
+          customPalettes: [],
           palettes: [],
           selectedName: "",
           language: "r",
           vision: "normal",
           query: "",
-          optionLimit: PAGE_SIZE
+          optionLimit: PAGE_SIZE,
+          draftName: "",
+          draftColors: []
         };
 
         wcPaths.forEach((path) => {
@@ -1302,6 +1607,49 @@
           });
         }
 
+        function normalizePaletteName(value, fallback) {
+          const clean = String(value || "")
+            .replace(/\s+/g, " ")
+            .trim();
+          if (clean) return clean.slice(0, 60);
+          return String(fallback || "").trim();
+        }
+
+        function uniqueHexColors(colors, limit) {
+          const capped = Math.max(1, Math.min(Number(limit) || MAX_CUSTOM_COLORS, MAX_CUSTOM_COLORS));
+          const seen = new Set();
+          const unique = [];
+          (Array.isArray(colors) ? colors : []).forEach((color) => {
+            if (unique.length >= capped) return;
+            const hex = normalizeHex(color);
+            if (!hex || seen.has(hex)) return;
+            seen.add(hex);
+            unique.push(hex);
+          });
+          return unique;
+        }
+
+        function makePaletteRecord(raw, fallbackOrigin) {
+          const colors = uniqueHexColors(raw?.palette || []);
+          const name = normalizePaletteName(raw?.name, "");
+          if (!name || !colors.length) return null;
+
+          const createdAtValue = Number(raw?.createdAt);
+          return {
+            id: String(raw?.id || "").trim(),
+            name,
+            source: String(raw?.source || "").trim(),
+            kind: String(raw?.kind || "").trim(),
+            palette: colors,
+            origin: String(raw?.origin || fallbackOrigin || "base").trim() || "base",
+            createdAt: Number.isFinite(createdAtValue) ? createdAtValue : 0
+          };
+        }
+
+        function createCustomPaletteId() {
+          return `cp_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+        }
+
         function readStateFromUrl() {
           const params = new URLSearchParams(window.location.search);
           state.language = normalizeLanguage(params.get("language") || "r");
@@ -1323,6 +1671,7 @@
           } else {
             url.searchParams.delete("vision");
           }
+
           history.replaceState({}, "", url);
         }
 
@@ -1346,6 +1695,96 @@
           }
 
           state.selectedName = state.palettes[0].name;
+        }
+
+        function loadCustomPalettesFromStorage() {
+          let parsed = [];
+          try {
+            parsed = JSON.parse(window.localStorage.getItem(CUSTOM_STORAGE_KEY) || "[]");
+          } catch (_) {
+            parsed = [];
+          }
+
+          if (!Array.isArray(parsed)) {
+            state.customPalettes = [];
+            return;
+          }
+
+          state.customPalettes = parsed
+            .map((item) =>
+              makePaletteRecord(
+                {
+                  id: item?.id || createCustomPaletteId(),
+                  name: item?.name || "",
+                  source: "My collection",
+                  kind: "custom",
+                  palette: item?.palette || [],
+                  origin: "custom",
+                  createdAt: item?.createdAt || 0
+                },
+                "custom"
+              )
+            )
+            .filter(Boolean);
+        }
+
+        function saveCustomPalettesToStorage() {
+          const payload = state.customPalettes.map((palette) => ({
+            id: palette.id,
+            name: palette.name,
+            palette: palette.palette,
+            createdAt: palette.createdAt || 0
+          }));
+          try {
+            window.localStorage.setItem(CUSTOM_STORAGE_KEY, JSON.stringify(payload));
+          } catch (_) {
+            // Ignore storage failures (private mode / quota).
+          }
+        }
+
+        function paletteNameExists(name) {
+          const target = String(name || "").trim().toLowerCase();
+          if (!target) return false;
+          return state.palettes.some((palette) => palette.name.toLowerCase() === target);
+        }
+
+        function nextAvailablePaletteName(name) {
+          const baseName = normalizePaletteName(name, "My palette");
+          if (!paletteNameExists(baseName)) return baseName;
+
+          let counter = 2;
+          let next = `${baseName} (${counter})`;
+          while (paletteNameExists(next)) {
+            counter += 1;
+            next = `${baseName} (${counter})`;
+          }
+          return next;
+        }
+
+        function rebuildPaletteCatalog() {
+          const merged = [];
+          const seen = new Set();
+
+          const pushUnique = (palette) => {
+            const record = makePaletteRecord(palette, palette?.origin || "base");
+            if (!record) return;
+            const key = record.name.toLowerCase();
+            if (seen.has(key)) return;
+            seen.add(key);
+            merged.push(record);
+          };
+
+          state.customPalettes
+            .slice()
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+            .forEach((palette) => pushUnique({ ...palette, source: "My collection", kind: "custom", origin: "custom" }));
+
+          state.basePalettes
+            .slice()
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .forEach((palette) => pushUnique({ ...palette, origin: "base" }));
+
+          state.palettes = merged;
         }
 
         function filteredPalettes() {
@@ -1479,6 +1918,38 @@
           heroLogo.style.setProperty("--hero-bg-fade", "rgba(22, 71, 163, 0.02)");
         }
 
+        function isLightColor(hex) {
+          const rgb = hexToRgb(hex);
+          const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
+          return luminance >= 0.62;
+        }
+
+        function resetStudioTheme() {
+          const rootStyle = document.documentElement?.style;
+          if (!rootStyle) return;
+          rootStyle.setProperty("--studio-accent", "var(--green-m)");
+          rootStyle.setProperty("--studio-accent-hover", "#123b87");
+          rootStyle.setProperty("--studio-accent-text", "#ffffff");
+        }
+
+        function applyStudioTheme(colors) {
+          const rootStyle = document.documentElement?.style;
+          if (!rootStyle) return;
+
+          if (!colors.length) {
+            resetStudioTheme();
+            return;
+          }
+
+          const accent = colors[Math.min(1, colors.length - 1)] || colors[0];
+          const hover = mixColor(accent, "#000000", 0.22);
+          const text = isLightColor(accent) ? "#0e0e0d" : "#ffffff";
+
+          rootStyle.setProperty("--studio-accent", accent);
+          rootStyle.setProperty("--studio-accent-hover", hover);
+          rootStyle.setProperty("--studio-accent-text", text);
+        }
+
         function applyHeroLogoTheme(colors) {
           if (!heroLogo) return;
           if (!colors.length) {
@@ -1496,6 +1967,7 @@
         function resetPalettePillTheme() {
           resetCountBadgeTheme();
           resetHeroLogoTheme();
+          resetStudioTheme();
           if (!palettePill || !paletteDot) return;
           palettePill.style.background = "var(--green-bg)";
           palettePill.style.borderColor = "#c4d8ff";
@@ -1515,6 +1987,7 @@
 
           applyCountBadgeTheme(colors);
           applyHeroLogoTheme(colors);
+          applyStudioTheme(colors);
 
           if (!palettePill || !paletteDot) return;
 
@@ -1583,7 +2056,7 @@
         function renderSelection() {
           const selected = getSelectedPalette();
           if (!selected) {
-            comboName.textContent = "Nenhuma paleta";
+            comboName.textContent = "No palette selected";
             comboSwatches.innerHTML = "";
             renderPaletteHexValues([]);
             resetPalettePillTheme();
@@ -1598,12 +2071,251 @@
           applyPaletteToLogoWithColors(selected.name, displayColors);
         }
 
+        function refreshPaletteDependentViews() {
+          ensureSelectedPalette();
+          writeStateToUrl();
+          renderSelection();
+          renderOptions();
+          renderPlots();
+          syncSpaceDataWithCatalog();
+          drawPaletteSpace();
+          renderStudioCollection();
+        }
+
+        function setStudioMessage(text, status) {
+          if (!studioMessage) return;
+          studioMessage.textContent = String(text || "");
+          studioMessage.classList.remove("is-error", "is-success");
+          if (status === "error") {
+            studioMessage.classList.add("is-error");
+          } else if (status === "success") {
+            studioMessage.classList.add("is-success");
+          }
+        }
+
+        function renderStudioDraft() {
+          if (!studioDraftList) return;
+
+          state.draftColors = uniqueHexColors(state.draftColors, MAX_CUSTOM_COLORS);
+          if (studioNameInput && state.draftName !== studioNameInput.value) {
+            studioNameInput.value = state.draftName;
+          }
+
+          if (!state.draftColors.length) {
+            studioDraftList.innerHTML = '<li class="studio-empty">Your draft has no colors yet.</li>';
+            return;
+          }
+
+          studioDraftList.innerHTML = state.draftColors
+            .map(
+              (color, index) => `
+                <li class="studio-chip">
+                  <span class="studio-chip-swatch" style="background:${color};"></span>
+                  <span class="studio-chip-code">${color.toUpperCase()}</span>
+                  <button type="button" class="studio-chip-remove" data-remove-index="${index}" aria-label="Remove color">×</button>
+                </li>
+              `
+            )
+            .join("");
+        }
+
+        function downloadPaletteJson(filename, payload) {
+          const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+          const anchor = document.createElement("a");
+          anchor.href = url;
+          anchor.download = filename;
+          document.body.appendChild(anchor);
+          anchor.click();
+          anchor.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 0);
+        }
+
+        function renderStudioCollection() {
+          if (!studioCollection || !studioMeta) return;
+
+          const sorted = state.customPalettes
+            .slice()
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+          studioMeta.textContent = `${sorted.length} saved`;
+
+          if (!sorted.length) {
+            studioCollection.innerHTML = '<div class="studio-empty">No saved palettes yet.</div>';
+            return;
+          }
+
+          studioCollection.innerHTML = sorted
+            .map((palette) => {
+              const swatches = renderSwatchesHtml(palette.palette, 12);
+              return `
+                <article class="studio-palette-item">
+                  <div class="studio-palette-head">
+                    <span class="studio-palette-name">${escapeHtml(palette.name)}</span>
+                    <span class="studio-palette-meta">${palette.palette.length} colors</span>
+                  </div>
+                  <div class="swatch-row">${swatches}</div>
+                  <div class="studio-inline">
+                    <button type="button" class="studio-btn" data-action="apply" data-id="${escapeAttr(palette.id)}">Apply</button>
+                    <button type="button" class="studio-btn" data-action="export" data-id="${escapeAttr(palette.id)}">JSON</button>
+                    <button type="button" class="studio-btn danger" data-action="delete" data-id="${escapeAttr(palette.id)}">Delete</button>
+                  </div>
+                </article>
+              `;
+            })
+            .join("");
+        }
+
+        function addColorToDraft(rawColor) {
+          const hex = normalizeHex(rawColor);
+          if (!hex) {
+            setStudioMessage("Invalid color. Use the #RRGGBB format.", "error");
+            return;
+          }
+
+          if (state.draftColors.includes(hex)) {
+            setStudioMessage("This color is already in the draft.", "error");
+            return;
+          }
+
+          if (state.draftColors.length >= MAX_CUSTOM_COLORS) {
+            setStudioMessage(`Limit of ${MAX_CUSTOM_COLORS} colors per palette.`, "error");
+            return;
+          }
+
+          state.draftColors.push(hex);
+          renderStudioDraft();
+          setStudioMessage("Color added to draft.", "success");
+        }
+
+        function addCurrentPaletteToDraft() {
+          const selected = getSelectedPalette();
+          if (!selected) {
+            setStudioMessage("Select a palette before adding colors.", "error");
+            return;
+          }
+
+          const merged = uniqueHexColors([...state.draftColors, ...selected.palette], MAX_CUSTOM_COLORS);
+          const added = merged.length - state.draftColors.length;
+          state.draftColors = merged;
+
+          if (!state.draftName) {
+            state.draftName = `${selected.name} remix`;
+          }
+
+          renderStudioDraft();
+          if (added > 0) {
+            setStudioMessage(`${added} color(s) added from the current palette.`, "success");
+          } else {
+            setStudioMessage("All colors from the current palette are already in the draft.", "error");
+          }
+        }
+
+        function exportPaletteByNameAndColors(name, colors) {
+          const safeName = normalizePaletteName(name, "my-palette").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+          const safeColors = uniqueHexColors(colors, MAX_CUSTOM_COLORS);
+          if (!safeColors.length) {
+            setStudioMessage("Add colors before exporting.", "error");
+            return;
+          }
+
+          downloadPaletteJson(`${safeName || "palette"}.json`, {
+            name: normalizePaletteName(name, "My palette"),
+            palette: safeColors,
+            source: "My collection",
+            kind: "custom"
+          });
+          setStudioMessage("JSON exported successfully.", "success");
+        }
+
+        function saveDraftPalette() {
+          const rawName = studioNameInput ? studioNameInput.value : state.draftName;
+          const colors = uniqueHexColors(state.draftColors, MAX_CUSTOM_COLORS);
+
+          if (colors.length < 2) {
+            setStudioMessage("Build a palette with at least 2 colors to save.", "error");
+            return;
+          }
+
+          const finalName = nextAvailablePaletteName(rawName || "My palette");
+          const record = makePaletteRecord(
+            {
+              id: createCustomPaletteId(),
+              name: finalName,
+              source: "My collection",
+              kind: "custom",
+              palette: colors,
+              origin: "custom",
+              createdAt: Date.now()
+            },
+            "custom"
+          );
+
+          if (!record) {
+            setStudioMessage("Could not save the palette.", "error");
+            return;
+          }
+
+          state.customPalettes.push(record);
+          saveCustomPalettesToStorage();
+          rebuildPaletteCatalog();
+
+          state.selectedName = record.name;
+          state.draftName = record.name;
+          refreshPaletteDependentViews();
+          renderStudioDraft();
+          setStudioMessage("Palette saved to your collection.", "success");
+        }
+
+        function clearDraftPalette() {
+          state.draftName = "";
+          state.draftColors = [];
+          if (studioNameInput) studioNameInput.value = "";
+          if (studioColorInput) studioColorInput.value = "";
+          renderStudioDraft();
+          setStudioMessage("Draft cleared.", "success");
+        }
+
+        function removeCustomPaletteById(id) {
+          const before = state.customPalettes.length;
+          const target = state.customPalettes.find((palette) => palette.id === id);
+          state.customPalettes = state.customPalettes.filter((palette) => palette.id !== id);
+          if (state.customPalettes.length === before) return;
+
+          saveCustomPalettesToStorage();
+          rebuildPaletteCatalog();
+
+          if (target && target.name.toLowerCase() === state.selectedName.toLowerCase()) {
+            ensureSelectedPalette();
+          }
+
+          refreshPaletteDependentViews();
+          setStudioMessage("Palette removed from your collection.", "success");
+        }
+
+        function clearCustomPaletteLibrary() {
+          if (!state.customPalettes.length) {
+            setStudioMessage("Your collection is already empty.", "error");
+            return;
+          }
+
+          const confirmed = window.confirm("Do you want to remove all palettes from your collection?");
+          if (!confirmed) return;
+
+          state.customPalettes = [];
+          saveCustomPalettesToStorage();
+          rebuildPaletteCatalog();
+          ensureSelectedPalette();
+          refreshPaletteDependentViews();
+          setStudioMessage("Collection cleared.", "success");
+        }
+
         function renderOptions() {
           const filtered = filteredPalettes();
           countBadge.textContent = `${filtered.length} palettes`;
 
           if (!filtered.length) {
-            optionsList.innerHTML = '<div style="padding:12px;color:#6a6a66;font-size:12px;">Nenhuma paleta encontrada.</div>';
+            optionsList.innerHTML = '<div style="padding:12px;color:#6a6a66;font-size:12px;">No palettes found.</div>';
             return;
           }
 
@@ -1635,7 +2347,7 @@
 
           const moreButton =
             filtered.length > visible.length
-              ? `<button type="button" class="load-more" id="loadMoreOptions">Carregar mais (${filtered.length - visible.length})</button>`
+              ? `<button type="button" class="load-more" id="loadMoreOptions">Load more (${filtered.length - visible.length})</button>`
               : "";
 
           optionsList.innerHTML = `${rows}${moreButton}`;
@@ -1981,11 +2693,7 @@
           const selected = getPaletteByName(nextName);
           if (!selected) return;
           state.selectedName = selected.name;
-          writeStateToUrl();
-          renderSelection();
-          renderOptions();
-          renderPlots();
-          drawPaletteSpace();
+          refreshPaletteDependentViews();
         }
 
         function bindEvents() {
@@ -2025,6 +2733,87 @@
           });
         }
 
+        function bindStudioEvents() {
+          if (!studioDraftList) return;
+
+          studioNameInput?.addEventListener("input", () => {
+            state.draftName = studioNameInput.value;
+          });
+
+          studioAddColorBtn?.addEventListener("click", () => {
+            addColorToDraft(studioColorInput ? studioColorInput.value : "");
+            if (studioColorInput) {
+              studioColorInput.value = "";
+              studioColorInput.focus();
+            }
+          });
+
+          studioColorInput?.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter") return;
+            event.preventDefault();
+            addColorToDraft(studioColorInput.value);
+            studioColorInput.value = "";
+          });
+
+          studioAddCurrentBtn?.addEventListener("click", () => {
+            addCurrentPaletteToDraft();
+          });
+
+          studioSaveBtn?.addEventListener("click", () => {
+            saveDraftPalette();
+          });
+
+          studioExportBtn?.addEventListener("click", () => {
+            exportPaletteByNameAndColors(studioNameInput?.value || state.draftName || "My palette", state.draftColors);
+          });
+
+          studioClearBtn?.addEventListener("click", () => {
+            clearDraftPalette();
+          });
+
+          studioClearLibraryBtn?.addEventListener("click", () => {
+            clearCustomPaletteLibrary();
+          });
+
+          studioDraftList.addEventListener("click", (event) => {
+            const target = event.target instanceof Element ? event.target.closest("button[data-remove-index]") : null;
+            if (!target) return;
+
+            const index = Number(target.getAttribute("data-remove-index"));
+            if (!Number.isInteger(index) || index < 0 || index >= state.draftColors.length) return;
+            state.draftColors.splice(index, 1);
+            renderStudioDraft();
+            setStudioMessage("Color removed from draft.", "success");
+          });
+
+          studioCollection?.addEventListener("click", (event) => {
+            const target = event.target instanceof Element ? event.target.closest("button[data-action]") : null;
+            if (!target) return;
+
+            const action = target.getAttribute("data-action");
+            const id = target.getAttribute("data-id");
+            if (!action || !id) return;
+
+            const palette = state.customPalettes.find((item) => item.id === id);
+            if (!palette) return;
+
+            if (action === "apply") {
+              selectPalette(palette.name);
+              setStudioMessage(`Palette applied: ${palette.name}.`, "success");
+              return;
+            }
+
+            if (action === "export") {
+              exportPaletteByNameAndColors(palette.name, palette.palette);
+              return;
+            }
+
+            if (action === "delete") {
+              removeCustomPaletteById(id);
+            }
+          });
+        }
+
         async function loadPalettes() {
           let raw;
           try {
@@ -2041,27 +2830,35 @@
             }
           }
 
-          state.palettes = raw
-            .map((item) => ({
-              name: String(item.name || "").trim(),
-              source: String(item.source || "").trim(),
-              kind: String(item.kind || "").trim(),
-              palette: Array.isArray(item.palette) ? item.palette.map(normalizeHex).filter(Boolean) : []
-            }))
-            .filter((item) => item.name && item.palette.length);
+          const list = Array.isArray(raw) ? raw : [];
 
-          state.palettes.sort((a, b) => a.name.localeCompare(b.name));
+          state.basePalettes = list
+            .map((item) =>
+              makePaletteRecord(
+                {
+                  name: item?.name || "",
+                  source: item?.source || "",
+                  kind: item?.kind || "",
+                  palette: item?.palette || [],
+                  origin: "base"
+                },
+                "base"
+              )
+            )
+            .filter(Boolean);
         }
 
         function handleLoadError(error) {
-          countBadge.textContent = "Erro";
-          comboName.textContent = "Falha ao carregar";
+          countBadge.textContent = "Error";
+          comboName.textContent = "Load failed";
           comboSwatches.innerHTML = "";
           optionsList.innerHTML =
-            '<div style="padding:12px;color:#6a6a66;font-size:12px;">Erro ao carregar as paletas locais. Rode <code>python3 -m http.server 8000</code> e abra via http://localhost:8000.</div>';
-          renderEmptyPlots("Sem dados");
+            '<div style="padding:12px;color:#6a6a66;font-size:12px;">Failed to load local palettes. Run <code>python3 -m http.server 8000</code> and open http://localhost:8000.</div>';
+          renderEmptyPlots("No data");
           renderPaletteHexValues([]);
           resetPalettePillTheme();
+          renderStudioDraft();
+          renderStudioCollection();
         }
 
         // ── Palette Space ──────────────────────────────────────────────────────
@@ -2079,6 +2876,7 @@
         const psTooltip = document.getElementById("psTooltip");
         const psWrap    = document.getElementById("psWrap");
 
+        let spaceBaseData    = [];
         let spaceData        = [];
         let spacePoints      = [];
         let spaceHovered     = -1;
@@ -2098,6 +2896,186 @@
         let spaceTouchAnchorWorldX  = 0;
         let spaceTouchAnchorWorldY  = 0;
 
+        function spaceClamp(value, min, max) {
+          return Math.max(min, Math.min(max, value));
+        }
+
+        function spaceHash(input) {
+          const text = String(input || "");
+          let hash = 2166136261;
+          for (let i = 0; i < text.length; i += 1) {
+            hash ^= text.charCodeAt(i);
+            hash = Math.imul(hash, 16777619);
+          }
+          return hash >>> 0;
+        }
+
+        function paletteFeature(colors) {
+          const safe = uniqueHexColors(colors || [], MAX_CUSTOM_COLORS);
+          if (!safe.length) return null;
+
+          const rgbs = safe.map((color) => hexToRgb(color));
+          const len = rgbs.length || 1;
+
+          let sumR = 0;
+          let sumG = 0;
+          let sumB = 0;
+          rgbs.forEach((rgb) => {
+            sumR += rgb.r;
+            sumG += rgb.g;
+            sumB += rgb.b;
+          });
+
+          const meanR = sumR / len;
+          const meanG = sumG / len;
+          const meanB = sumB / len;
+
+          let varR = 0;
+          let varG = 0;
+          let varB = 0;
+          rgbs.forEach((rgb) => {
+            varR += (rgb.r - meanR) ** 2;
+            varG += (rgb.g - meanG) ** 2;
+            varB += (rgb.b - meanB) ** 2;
+          });
+
+          return {
+            meanR: meanR / 255,
+            meanG: meanG / 255,
+            meanB: meanB / 255,
+            stdR: Math.sqrt(varR / len) / 255,
+            stdG: Math.sqrt(varG / len) / 255,
+            stdB: Math.sqrt(varB / len) / 255,
+            count: len / MAX_CUSTOM_COLORS
+          };
+        }
+
+        function featureDistance(a, b) {
+          return (
+            (a.meanR - b.meanR) ** 2 +
+            (a.meanG - b.meanG) ** 2 +
+            (a.meanB - b.meanB) ** 2 +
+            0.35 * (a.stdR - b.stdR) ** 2 +
+            0.35 * (a.stdG - b.stdG) ** 2 +
+            0.35 * (a.stdB - b.stdB) ** 2 +
+            0.1 * (a.count - b.count) ** 2
+          );
+        }
+
+        function fallbackCoordsFromHash(seed) {
+          const hash = spaceHash(seed);
+          const x = (((hash & 1023) / 1023) * 2) - 1;
+          const y = ((((hash >>> 10) & 1023) / 1023) * 2) - 1;
+          return {
+            x: spaceClamp(x, -0.95, 0.95),
+            y: spaceClamp(y, -0.95, 0.95)
+          };
+        }
+
+        function estimateCustomSpaceCoords(palette) {
+          const colors = uniqueHexColors(palette?.palette || palette?.colors || [], MAX_CUSTOM_COLORS);
+          const feature = paletteFeature(colors);
+          const candidates = feature
+            ? spaceBaseData
+                .map((rec) => {
+                  const x = Number(rec?.x);
+                  const y = Number(rec?.y);
+                  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+                  const recFeature = paletteFeature(rec?.colors || rec?.palette || []);
+                  if (!recFeature) return null;
+                  return { x, y, d: featureDistance(feature, recFeature) };
+                })
+                .filter(Boolean)
+                .sort((a, b) => a.d - b.d)
+                .slice(0, 8)
+            : [];
+
+          let x = 0;
+          let y = 0;
+
+          if (candidates.length) {
+            let totalWeight = 0;
+            candidates.forEach((cand) => {
+              const weight = 1 / (Math.sqrt(cand.d) + 1e-5);
+              x += cand.x * weight;
+              y += cand.y * weight;
+              totalWeight += weight;
+            });
+            x /= totalWeight || 1;
+            y /= totalWeight || 1;
+          } else {
+            const fallback = fallbackCoordsFromHash(`${palette?.name || "custom"}:${colors.join(",")}`);
+            x = fallback.x;
+            y = fallback.y;
+          }
+
+          // Small deterministic jitter helps avoid stacking points at exactly the same coordinate.
+          const jitterHash = spaceHash(`${palette?.name || ""}:${colors.join(",")}`);
+          const angle = ((jitterHash % 3600) / 3600) * Math.PI * 2;
+          const radius = 0.012 + (((jitterHash >>> 12) % 1000) / 1000) * 0.028;
+          x += Math.cos(angle) * radius;
+          y += Math.sin(angle) * radius;
+
+          return {
+            x: spaceClamp(x, -0.98, 0.98),
+            y: spaceClamp(y, -0.98, 0.98)
+          };
+        }
+
+        function syncSpaceDataWithCatalog() {
+          if (!psCanvas) return;
+
+          const merged = [];
+          const seenNames = new Set();
+
+          (Array.isArray(spaceBaseData) ? spaceBaseData : []).forEach((rec) => {
+            const name = String(rec?.name || "").trim();
+            const x = Number(rec?.x);
+            const y = Number(rec?.y);
+            if (!name || !Number.isFinite(x) || !Number.isFinite(y)) return;
+
+            const key = name.toLowerCase();
+            if (seenNames.has(key)) return;
+            seenNames.add(key);
+
+            merged.push({
+              ...rec,
+              name,
+              x: spaceClamp(x, -1, 1),
+              y: spaceClamp(y, -1, 1),
+              kind: String(rec?.kind || "").trim(),
+              colors: uniqueHexColors(rec?.colors || rec?.palette || [], MAX_CUSTOM_COLORS)
+            });
+          });
+
+          state.customPalettes.forEach((palette) => {
+            const name = String(palette?.name || "").trim();
+            if (!name) return;
+
+            const key = name.toLowerCase();
+            if (seenNames.has(key)) return;
+
+            const colors = uniqueHexColors(palette?.palette || [], MAX_CUSTOM_COLORS);
+            if (!colors.length) return;
+
+            const pos = estimateCustomSpaceCoords({ name, palette: colors });
+            merged.push({
+              name,
+              kind: "custom",
+              colors,
+              x: pos.x,
+              y: pos.y,
+              origin: "custom"
+            });
+            seenNames.add(key);
+          });
+
+          spaceData = merged;
+          if (spaceHovered >= spaceData.length) {
+            spaceHovered = -1;
+          }
+        }
+
         async function loadCoordsData() {
           if (!psCanvas) return;
           let raw;
@@ -2109,10 +3087,11 @@
             if (Array.isArray(window.__PALETTE_COORDS__) && window.__PALETTE_COORDS__.length) {
               raw = window.__PALETTE_COORDS__;
             } else {
-              return;
+              raw = [];
             }
           }
-          spaceData = raw;
+          spaceBaseData = Array.isArray(raw) ? raw : [];
+          syncSpaceDataWithCatalog();
         }
 
         function computeSpacePoints() {
@@ -2531,6 +3510,10 @@
           readStateFromUrl();
           visionMode.value = state.vision;
           bindEvents();
+          bindStudioEvents();
+          loadCustomPalettesFromStorage();
+          renderStudioDraft();
+          renderStudioCollection();
 
           try {
             await loadPalettes();
@@ -2539,13 +3522,10 @@
             return;
           }
 
+          rebuildPaletteCatalog();
           await loadCoordsData();
 
-          ensureSelectedPalette();
-          writeStateToUrl();
-          renderSelection();
-          renderOptions();
-          renderPlots();
+          refreshPaletteDependentViews();
           initPaletteSpace();
         }
 
