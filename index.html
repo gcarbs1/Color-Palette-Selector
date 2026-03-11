@@ -620,6 +620,54 @@
         background: linear-gradient(180deg, #ffffff 0%, #fbfaf7 100%);
       }
 
+      .palette-hex-body {
+        padding: 14px 16px 16px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .palette-hex-hint {
+        font-size: 12px;
+        color: var(--sub);
+      }
+
+      .palette-hex-list {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+        gap: 8px;
+      }
+
+      .palette-hex-item {
+        min-height: 36px;
+        padding: 7px 9px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .palette-hex-swatch {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1px solid rgba(0, 0, 0, 0.14);
+        flex: 0 0 auto;
+      }
+
+      .palette-hex-code {
+        font: 600 12px/1 "Outfit", sans-serif;
+        letter-spacing: 0.02em;
+        color: var(--text);
+      }
+
+      .palette-hex-empty {
+        font-size: 12px;
+        color: var(--sub);
+      }
+
       @media (prefers-reduced-motion: reduce) {
         .wc-mark g {
           animation: none;
@@ -1062,6 +1110,18 @@
         </div>
       </section>
 
+      <section id="palette-hex" class="explorer-panel" aria-label="Palette hexadecimal values">
+        <div class="explorer-head">
+          <span class="explorer-title">Palette Hex Values</span>
+          <span id="paletteHexMeta" class="count-badge">Loading...</span>
+        </div>
+        <div class="palette-hex-body">
+          <ul id="paletteHexList" class="palette-hex-list">
+            <li class="palette-hex-empty">Loading palette colors...</li>
+          </ul>
+        </div>
+      </section>
+
       <section id="palette-space" class="explorer-panel" aria-label="Palette similarity map">
         <div class="explorer-head">
           <span class="explorer-title">Palette Space</span>
@@ -1128,6 +1188,8 @@
         const searchInput = document.getElementById("paletteSearch");
         const optionsList = document.getElementById("paletteOptions");
         const visionMode = document.getElementById("visionMode");
+        const paletteHexMeta = document.getElementById("paletteHexMeta");
+        const paletteHexList = document.getElementById("paletteHexList");
 
         const plotSvgs = {
           bar: document.getElementById("plot-bar"),
@@ -1312,6 +1374,30 @@
             .join("");
         }
 
+        function renderPaletteHexValues(colors) {
+          if (!paletteHexList || !paletteHexMeta) return;
+
+          const safeColors = Array.isArray(colors) ? colors.map(normalizeHex).filter(Boolean) : [];
+          paletteHexMeta.textContent = `${safeColors.length} colors`;
+
+          if (!safeColors.length) {
+            paletteHexList.innerHTML = '<li class="palette-hex-empty">No colors available.</li>';
+            return;
+          }
+
+          paletteHexList.innerHTML = safeColors
+            .map((color) => {
+              const hex = color.toUpperCase();
+              return `
+                <li class="palette-hex-item">
+                  <span class="palette-hex-swatch" style="background:${hex};"></span>
+                  <span class="palette-hex-code">${hex}</span>
+                </li>
+              `;
+            })
+            .join("");
+        }
+
         function resetCountBadgeTheme() {
           if (!countBadge) return;
           countBadge.style.background = "var(--green-bg)";
@@ -1446,6 +1532,7 @@
           if (!selected) {
             comboName.textContent = "Nenhuma paleta";
             comboSwatches.innerHTML = "";
+            renderPaletteHexValues([]);
             resetPalettePillTheme();
             return;
           }
@@ -1453,6 +1540,7 @@
           const displayColors = getDisplayPaletteColors(selected);
           comboName.textContent = selected.name;
           comboSwatches.innerHTML = renderSwatchesHtml(displayColors, 10);
+          renderPaletteHexValues(displayColors);
 
           applyPaletteToLogoWithColors(selected.name, displayColors);
         }
@@ -1911,6 +1999,7 @@
           optionsList.innerHTML =
             '<div style="padding:12px;color:#6a6a66;font-size:12px;">Erro ao carregar as paletas locais. Rode <code>python3 -m http.server 8000</code> e abra via http://localhost:8000.</div>';
           renderEmptyPlots("Sem dados");
+          renderPaletteHexValues([]);
           resetPalettePillTheme();
         }
 
