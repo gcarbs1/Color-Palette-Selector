@@ -1368,6 +1368,58 @@
           return colors[((index % colors.length) + colors.length) % colors.length];
         }
 
+        function buildDiversePlotPalette(colors, count) {
+          const base = Array.isArray(colors) && colors.length ? colors : DEFAULT_COLORS;
+          const target = Math.max(1, Math.min(Math.floor(count || base.length), base.length));
+
+          if (base.length <= target) {
+            return base.slice();
+          }
+
+          const sampled = [];
+          const used = new Set();
+
+          for (let i = 0; i < target; i += 1) {
+            const ratio = target <= 1 ? 0 : i / (target - 1);
+            let idx = Math.round(ratio * (base.length - 1));
+            while (used.has(idx) && idx < base.length - 1) {
+              idx += 1;
+            }
+            while (used.has(idx) && idx > 0) {
+              idx -= 1;
+            }
+            if (!used.has(idx)) {
+              used.add(idx);
+              sampled.push(base[idx]);
+            }
+          }
+
+          if (sampled.length < target) {
+            for (let i = 0; i < base.length && sampled.length < target; i += 1) {
+              if (!used.has(i)) {
+                used.add(i);
+                sampled.push(base[i]);
+              }
+            }
+          }
+
+          // Reorder extremes (start/end/start+1/end-1/...) to maximize contrast between neighbors.
+          const diverse = [];
+          let left = 0;
+          let right = sampled.length - 1;
+          while (left <= right) {
+            if (left === right) {
+              diverse.push(sampled[left]);
+            } else {
+              diverse.push(sampled[left], sampled[right]);
+            }
+            left += 1;
+            right -= 1;
+          }
+
+          return diverse;
+        }
+
         function renderSwatchesHtml(colors, limit) {
           return colors
             .slice(0, limit)
@@ -1626,6 +1678,7 @@
 
         function renderBarPlot(colors) {
           const values = [7, 4, 8, 5, 6, 3];
+          const plotColors = buildDiversePlotPalette(colors, values.length);
           const max = 9;
           const left = 34;
           const baseline = 168;
@@ -1639,7 +1692,7 @@
               const h = ((baseline - top) * value) / max;
               const x = left + index * step + (step - barWidth) / 2;
               const y = baseline - h;
-              return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${h.toFixed(2)}" rx="4" fill="${colorAt(colors, index)}"></rect>`;
+              return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${h.toFixed(2)}" rx="4" fill="${colorAt(plotColors, index)}"></rect>`;
             })
             .join("");
 
@@ -1648,6 +1701,7 @@
 
         function renderLinePlot(colors) {
           const values = [2, 4, 3, 6, 5, 8, 7, 9];
+          const plotColors = buildDiversePlotPalette(colors, values.length);
           const left = 34;
           const right = 296;
           const top = 26;
@@ -1667,7 +1721,7 @@
             .map(
               (point, index) =>
                 `<circle cx="${point.x.toFixed(2)}" cy="${point.y.toFixed(2)}" r="4.2" fill="${colorAt(
-                  colors,
+                  plotColors,
                   index
                 )}" stroke="#ffffff" stroke-width="1.5"></circle>`
             )
@@ -1675,13 +1729,14 @@
 
           return `
             ${axisBase()}
-            <path d="${areaPath}" fill="${rgba(colorAt(colors, 0), 0.18)}"></path>
-            <path d="${linePath}" fill="none" stroke="${colorAt(colors, 1)}" stroke-width="3"></path>
+            <path d="${areaPath}" fill="${rgba(colorAt(plotColors, 0), 0.18)}"></path>
+            <path d="${linePath}" fill="none" stroke="${colorAt(plotColors, 1)}" stroke-width="3"></path>
             ${marks}
           `;
         }
 
         function renderScatterPlot(colors) {
+          const plotColors = buildDiversePlotPalette(colors, Math.min(12, (colors || []).length || 12));
           const points = Array.from({ length: 30 }, (_, index) => ({
             x: 34 + ((index * 47) % 252),
             y: 28 + ((index * 61 + 17) % 136),
@@ -1691,7 +1746,7 @@
           const circles = points
             .map(
               (point, index) =>
-                `<circle cx="${point.x}" cy="${point.y}" r="${point.r}" fill="${colorAt(colors, index)}" fill-opacity="0.82"></circle>`
+                `<circle cx="${point.x}" cy="${point.y}" r="${point.r}" fill="${colorAt(plotColors, index)}" fill-opacity="0.82"></circle>`
             )
             .join("");
 
@@ -1705,6 +1760,7 @@
             { min: 22, q1: 35, med: 46, q3: 60, max: 78 },
             { min: 12, q1: 24, med: 40, q3: 54, max: 70 }
           ];
+          const plotColors = buildDiversePlotPalette(colors, groups.length);
           const left = 52;
           const step = 60;
           const y = (value) => 170 - value * 1.8;
@@ -1717,7 +1773,7 @@
               const median = y(group.med);
               const minY = y(group.min);
               const maxY = y(group.max);
-              const color = colorAt(colors, index);
+              const color = colorAt(plotColors, index);
               return `
                 <line x1="${x}" y1="${minY}" x2="${x}" y2="${maxY}" stroke="${color}" stroke-width="2"></line>
                 <line x1="${x - 12}" y1="${minY}" x2="${x + 12}" y2="${minY}" stroke="${color}" stroke-width="2"></line>
@@ -1736,6 +1792,7 @@
 
         function renderHistogram(colors) {
           const bins = [2, 5, 6, 9, 8, 6, 4, 2];
+          const plotColors = buildDiversePlotPalette(colors, bins.length);
           const max = 10;
           const left = 34;
           const baseline = 168;
@@ -1750,7 +1807,7 @@
               const y = baseline - h;
               return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${(barW - 2).toFixed(2)}" height="${h.toFixed(
                 2
-              )}" fill="${colorAt(colors, index)}"></rect>`;
+              )}" fill="${colorAt(plotColors, index)}"></rect>`;
             })
             .join("");
 
@@ -1788,6 +1845,7 @@
             [1, 2, 2, 3, 2, 3, 2],
             [1, 1, 2, 1, 2, 1, 1]
           ];
+          const plotColors = buildDiversePlotPalette(colors, series.length);
           const left = 34;
           const right = 296;
           const top = 26;
@@ -1805,7 +1863,7 @@
 
               const line = points.map((point, idx) => `${idx ? "L" : "M"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
               const area = `${line} L ${right} ${bottom} L ${left} ${bottom} Z`;
-              const color = colorAt(colors, rowIndex);
+              const color = colorAt(plotColors, rowIndex);
               return `
                 <path d="${area}" fill="${rgba(color, 0.2)}"></path>
                 <path d="${line}" fill="none" stroke="${color}" stroke-width="2.5"></path>
@@ -1842,6 +1900,7 @@
 
         function renderDonutPlot(colors) {
           const values = [22, 18, 15, 12, 10, 8];
+          const plotColors = buildDiversePlotPalette(colors, values.length);
           const total = values.reduce((acc, value) => acc + value, 0);
           let angle = 0;
           const cx = 160;
@@ -1855,7 +1914,7 @@
               const start = angle;
               const end = angle + span;
               angle = end;
-              return `<path d="${donutSegmentPath(cx, cy, outer, inner, start, end)}" fill="${colorAt(colors, index)}"></path>`;
+              return `<path d="${donutSegmentPath(cx, cy, outer, inner, start, end)}" fill="${colorAt(plotColors, index)}"></path>`;
             })
             .join("");
 
@@ -1868,6 +1927,7 @@
 
         function renderLollipopPlot(colors) {
           const values = [4, 9, 6, 8, 5, 7, 3];
+          const plotColors = buildDiversePlotPalette(colors, values.length);
           const max = 10;
           const left = 38;
           const bottom = 170;
@@ -1878,7 +1938,7 @@
             .map((value, index) => {
               const x = left + index * step;
               const y = bottom - ((bottom - top) * value) / max;
-              const color = colorAt(colors, index);
+              const color = colorAt(plotColors, index);
               return `
                 <line x1="${x}" y1="${bottom}" x2="${x}" y2="${y}" stroke="${rgba(color, 0.55)}" stroke-width="3"></line>
                 <circle cx="${x}" cy="${y}" r="7" fill="${color}" stroke="#ffffff" stroke-width="2"></circle>
