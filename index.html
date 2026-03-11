@@ -333,16 +333,260 @@
         text-transform: uppercase;
       }
 
-      .frame-wrap {
-        padding: 12px;
+      .count-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 28px;
+        border-radius: 999px;
+        border: 1px solid #c6d8ff;
+        background: var(--green-bg);
+        color: var(--green-m);
+        padding: 0 11px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
       }
 
-      .frame {
+      .workbench {
+        padding: 16px;
+      }
+
+      .selector-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 240px;
+        gap: 12px;
+        align-items: start;
+      }
+
+      .combo-wrap {
+        position: relative;
+      }
+
+      .combo-button {
         width: 100%;
-        min-height: 82vh;
+        border: 1px solid #d8d7d1;
+        background: #fff;
+        border-radius: 12px;
+        min-height: 46px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        cursor: pointer;
+        text-align: left;
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+
+      .combo-button:hover {
+        border-color: #b9b8b0;
+      }
+
+      .combo-button[aria-expanded="true"] {
+        border-color: #8eb0ef;
+        box-shadow: 0 0 0 4px rgba(22, 71, 163, 0.12);
+      }
+
+      .combo-selection {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .combo-name {
+        display: inline-block;
+        max-width: 160px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font: 600 14px/1.2 "Outfit", sans-serif;
+        color: var(--text);
+      }
+
+      .swatch-row {
+        display: flex;
+        gap: 3px;
+        align-items: center;
+      }
+
+      .swatch {
+        width: 14px;
+        height: 14px;
+        border-radius: 4px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        flex: 0 0 auto;
+      }
+
+      .combo-chevron {
+        font-size: 16px;
+        line-height: 1;
+        color: var(--sub);
+        flex: 0 0 auto;
+      }
+
+      .combo-dropdown {
+        position: absolute;
+        z-index: 30;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        border: 1px solid var(--border2);
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: var(--sh-md);
+        overflow: hidden;
+      }
+
+      .search-input {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid var(--border);
+        height: 42px;
+        padding: 0 12px;
+        font: 500 13px/1.2 "Outfit", sans-serif;
+        color: var(--text);
+      }
+
+      .search-input:focus {
+        outline: none;
+      }
+
+      .option-list {
+        max-height: 300px;
+        overflow: auto;
+      }
+
+      .option-item {
+        width: 100%;
+        border: none;
+        background: transparent;
+        padding: 10px 12px;
+        display: grid;
+        gap: 6px;
+        text-align: left;
+        cursor: pointer;
+        border-bottom: 1px solid #f0efec;
+      }
+
+      .option-item:last-child {
+        border-bottom: none;
+      }
+
+      .option-item:hover {
+        background: #f8f8f6;
+      }
+
+      .option-item.active {
+        background: #edf3ff;
+      }
+
+      .option-name {
+        font: 600 13px/1.2 "Outfit", sans-serif;
+        color: var(--text);
+      }
+
+      .option-meta {
+        font: 500 11px/1.2 "Outfit", sans-serif;
+        color: var(--sub);
+      }
+
+      .load-more {
+        width: 100%;
+        border: none;
+        border-top: 1px solid var(--border);
+        background: #f8f8f6;
+        padding: 10px 12px;
+        text-align: center;
+        font: 600 12px/1.2 "Outfit", sans-serif;
+        color: var(--green-m);
+        cursor: pointer;
+      }
+
+      .control-group {
+        display: grid;
+        gap: 6px;
+      }
+
+      .control-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+        color: var(--muted);
+      }
+
+      .control-select {
+        width: 100%;
+        min-height: 46px;
+        border: 1px solid #d8d7d1;
+        border-radius: 12px;
+        background: #fff;
+        color: var(--text);
+        font: 500 13px/1.2 "Outfit", sans-serif;
+        padding: 0 11px;
+      }
+
+      .control-select:focus {
+        outline: none;
+        border-color: #8eb0ef;
+        box-shadow: 0 0 0 4px rgba(22, 71, 163, 0.12);
+      }
+
+      .meta-row {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        font: 500 12px/1.2 "Outfit", sans-serif;
+        color: var(--sub);
+      }
+
+      .meta-row > span {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding-right: 10px;
+        border-right: 1px solid var(--border);
+      }
+
+      .meta-row > span:last-child {
+        border-right: none;
+        padding-right: 0;
+      }
+
+      .plot-grid {
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .plot-card {
         border: 1px solid var(--border);
         border-radius: 12px;
         background: #fff;
+        padding: 10px;
+      }
+
+      .plot-title {
+        font: 700 12px/1.2 "Outfit", sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .plot-svg {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 16 / 10;
+        display: block;
+        border: 1px solid #efeee9;
+        border-radius: 8px;
+        background: linear-gradient(180deg, #ffffff 0%, #fbfaf7 100%);
       }
 
       @media (prefers-reduced-motion: reduce) {
@@ -379,6 +623,14 @@
 
         .wc-mark {
           width: min(240px, 60vw);
+        }
+
+        .selector-row {
+          grid-template-columns: 1fr;
+        }
+
+        .plot-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
 
@@ -423,8 +675,16 @@
           padding: 28px 16px 48px;
         }
 
-        .frame {
-          min-height: 74vh;
+        .workbench {
+          padding: 12px;
+        }
+
+        .combo-name {
+          max-width: 120px;
+        }
+
+        .plot-grid {
+          grid-template-columns: 1fr;
         }
 
       }
@@ -592,106 +852,237 @@
     <main class="page">
       <section id="explorar" class="explorer-panel" aria-label="Explorador de paletas">
         <div class="explorer-head">
-          <span class="explorer-title">Palette Explorer</span>
+          <span class="explorer-title">Palette Workbench</span>
+          <span id="paletteCountBadge" class="count-badge">Carregando...</span>
         </div>
 
-        <div class="frame-wrap">
-          <iframe
-            id="paletteFrame"
-            class="frame"
-            title="Palette explorer"
-            loading="lazy"
-            referrerpolicy="strict-origin-when-cross-origin"
-            sandbox="allow-same-origin allow-scripts allow-top-navigation allow-modals"
-            allow="clipboard-write"
-            src="./palette-explorer.html?language=r"
-          ></iframe>
-        </div>
+        <div class="workbench">
+          <div class="selector-row">
+            <div class="combo-wrap" id="paletteComboWrap">
+              <button
+                id="paletteComboButton"
+                class="combo-button"
+                type="button"
+                role="combobox"
+                aria-expanded="false"
+                aria-haspopup="listbox"
+                aria-controls="paletteOptions"
+              >
+                <div class="combo-selection">
+                  <span id="comboName" class="combo-name">Carregando...</span>
+                  <div id="comboSwatches" class="swatch-row" aria-hidden="true"></div>
+                </div>
+                <span class="combo-chevron" aria-hidden="true">▾</span>
+              </button>
 
+              <div id="paletteDropdown" class="combo-dropdown" hidden>
+                <input
+                  id="paletteSearch"
+                  class="search-input"
+                  type="text"
+                  placeholder="Buscar paleta (ex.: ghoststory, viridis, set2)"
+                  autocomplete="off"
+                />
+                <div id="paletteOptions" class="option-list" role="listbox" aria-label="Lista de paletas"></div>
+              </div>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="visionMode">Simulação de visão</label>
+              <select id="visionMode" class="control-select">
+                <option value="normal">Normal</option>
+                <option value="deuteranopia">Deuteranopia</option>
+                <option value="protanopia">Protanopia</option>
+                <option value="tritanopia">Tritanopia</option>
+                <option value="achromatopsia">Acromatopsia</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="meta-row">
+            <span><strong>Source:</strong> <span id="metaSource">-</span></span>
+            <span><span id="metaCount">0</span> colors</span>
+            <span id="metaKind">unknown</span>
+          </div>
+
+          <div class="plot-grid">
+            <article class="plot-card">
+              <h3 class="plot-title">Bar Plot</h3>
+              <svg id="plot-bar" class="plot-svg" viewBox="0 0 320 200" aria-label="Bar plot"></svg>
+            </article>
+            <article class="plot-card">
+              <h3 class="plot-title">Line Plot</h3>
+              <svg id="plot-line" class="plot-svg" viewBox="0 0 320 200" aria-label="Line plot"></svg>
+            </article>
+            <article class="plot-card">
+              <h3 class="plot-title">Scatter Plot</h3>
+              <svg id="plot-scatter" class="plot-svg" viewBox="0 0 320 200" aria-label="Scatter plot"></svg>
+            </article>
+            <article class="plot-card">
+              <h3 class="plot-title">Box Plot</h3>
+              <svg id="plot-box" class="plot-svg" viewBox="0 0 320 200" aria-label="Box plot"></svg>
+            </article>
+            <article class="plot-card">
+              <h3 class="plot-title">Histogram</h3>
+              <svg id="plot-hist" class="plot-svg" viewBox="0 0 320 200" aria-label="Histogram"></svg>
+            </article>
+            <article class="plot-card">
+              <h3 class="plot-title">Heatmap</h3>
+              <svg id="plot-heat" class="plot-svg" viewBox="0 0 320 200" aria-label="Heatmap"></svg>
+            </article>
+            <article class="plot-card">
+              <h3 class="plot-title">Area Plot</h3>
+              <svg id="plot-area" class="plot-svg" viewBox="0 0 320 200" aria-label="Area plot"></svg>
+            </article>
+            <article class="plot-card">
+              <h3 class="plot-title">Donut Plot</h3>
+              <svg id="plot-donut" class="plot-svg" viewBox="0 0 320 200" aria-label="Donut plot"></svg>
+            </article>
+            <article class="plot-card">
+              <h3 class="plot-title">Lollipop Plot</h3>
+              <svg id="plot-lollipop" class="plot-svg" viewBox="0 0 320 200" aria-label="Lollipop plot"></svg>
+            </article>
+          </div>
+        </div>
       </section>
     </main>
 
+    <script src="./data/palettes.js"></script>
     <script>
       (function () {
-        const TOOL_BASE = "./palette-explorer.html";
-        const frame = document.getElementById("paletteFrame");
+        const DATA_URL = "./data/palettes.json";
+        const PAGE_SIZE = 180;
+        const DEFAULT_COLORS = ["#0f1b3f", "#1647a3", "#4a7dde", "#7fa3ea", "#c8d9ff", "#ecf3f9"];
+        const VISION_MATRICES = {
+          normal: [
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1]
+          ],
+          protanopia: [
+            [0.567, 0.433, 0],
+            [0.558, 0.442, 0],
+            [0, 0.242, 0.758]
+          ],
+          deuteranopia: [
+            [0.625, 0.375, 0],
+            [0.7, 0.3, 0],
+            [0, 0.3, 0.7]
+          ],
+          tritanopia: [
+            [0.95, 0.05, 0],
+            [0, 0.433, 0.567],
+            [0, 0.475, 0.525]
+          ],
+          achromatopsia: [
+            [0.299, 0.587, 0.114],
+            [0.299, 0.587, 0.114],
+            [0.299, 0.587, 0.114]
+          ]
+        };
+
         const palettePill = document.querySelector(".palette-pill");
         const paletteDot = palettePill ? palettePill.querySelector(".dot") : null;
         const paletteLabel = document.getElementById("paletteLabel");
-
         const wcPaths = Array.from(document.querySelectorAll(".wc-mark path"));
+
+        const countBadge = document.getElementById("paletteCountBadge");
+        const comboWrap = document.getElementById("paletteComboWrap");
+        const comboButton = document.getElementById("paletteComboButton");
+        const comboName = document.getElementById("comboName");
+        const comboSwatches = document.getElementById("comboSwatches");
+        const dropdown = document.getElementById("paletteDropdown");
+        const searchInput = document.getElementById("paletteSearch");
+        const optionsList = document.getElementById("paletteOptions");
+        const visionMode = document.getElementById("visionMode");
+        const metaSource = document.getElementById("metaSource");
+        const metaCount = document.getElementById("metaCount");
+        const metaKind = document.getElementById("metaKind");
+
+        const plotSvgs = {
+          bar: document.getElementById("plot-bar"),
+          line: document.getElementById("plot-line"),
+          scatter: document.getElementById("plot-scatter"),
+          box: document.getElementById("plot-box"),
+          hist: document.getElementById("plot-hist"),
+          heat: document.getElementById("plot-heat"),
+          area: document.getElementById("plot-area"),
+          donut: document.getElementById("plot-donut"),
+          lollipop: document.getElementById("plot-lollipop")
+        };
+
+        const state = {
+          palettes: [],
+          selectedName: "",
+          language: "r",
+          vision: "normal",
+          query: "",
+          optionLimit: PAGE_SIZE
+        };
+
         wcPaths.forEach((path) => {
           path.dataset.originalFill = path.getAttribute("fill") || "#0f1b3f";
         });
-
-        const PRESET_BASES = {
-          viridis: ["#440154", "#238a8d", "#fde725"],
-          magma: ["#0b0826", "#b73779", "#fcfdbf"],
-          plasma: ["#0d0887", "#cc4778", "#f0f921"],
-          inferno: ["#09080d", "#bc3754", "#fcffa4"],
-          turbo: ["#30123b", "#33b1ff", "#f9f871"],
-          spectral: ["#9e0142", "#fdae61", "#5e4fa2"],
-          set1: ["#e41a1c", "#377eb8", "#4daf4a"],
-          set2: ["#66c2a5", "#fc8d62", "#8da0cb"]
-        };
 
         function normalizeLanguage(value) {
           return value === "python" ? "python" : "r";
         }
 
-        function readPageState() {
-          const params = new URLSearchParams(window.location.search);
-          return {
-            language: normalizeLanguage(params.get("language") || "r"),
-            palette: (params.get("palette") || "").trim()
-          };
+        function escapeHtml(value) {
+          return String(value || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
         }
 
-        function buildToolUrl(state) {
-          const params = new URLSearchParams();
-          params.set("language", normalizeLanguage(state.language));
-          if (state.palette) {
-            params.set("palette", state.palette);
-          }
-          return `${TOOL_BASE}?${params.toString()}`;
+        function escapeAttr(value) {
+          return escapeHtml(value).replace(/"/g, "&quot;");
         }
 
-        function parseStateFromUrl(rawUrl) {
-          try {
-            const parsed = new URL(rawUrl, window.location.href);
-            return {
-              language: normalizeLanguage(parsed.searchParams.get("language") || "r"),
-              palette: (parsed.searchParams.get("palette") || "").trim()
-            };
-          } catch (_) {
-            return { language: "r", palette: "" };
-          }
-        }
+        function normalizeHex(color) {
+          const value = String(color || "").trim();
+          if (!value.startsWith("#")) return "";
 
-        function writePageState(state) {
-          const url = new URL(window.location.href);
-          url.searchParams.set("language", normalizeLanguage(state.language || "r"));
-          if (state.palette) {
-            url.searchParams.set("palette", state.palette);
-          } else {
-            url.searchParams.delete("palette");
+          if (/^#[0-9a-f]{3}$/i.test(value)) {
+            return `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}`.toLowerCase();
           }
-          history.replaceState({}, "", url);
+
+          if (/^#[0-9a-f]{4}$/i.test(value)) {
+            return `#${value[1]}${value[1]}${value[2]}${value[2]}${value[3]}${value[3]}`.toLowerCase();
+          }
+
+          if (/^#[0-9a-f]{6}$/i.test(value)) {
+            return value.toLowerCase();
+          }
+
+          if (/^#[0-9a-f]{8}$/i.test(value)) {
+            return value.slice(0, 7).toLowerCase();
+          }
+
+          return "";
         }
 
         function hexToRgb(hex) {
-          const clean = hex.replace("#", "");
-          const full = clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean;
+          const clean = normalizeHex(hex).replace("#", "");
+          if (!clean || clean.length !== 6) {
+            return { r: 0, g: 0, b: 0 };
+          }
           return {
-            r: parseInt(full.slice(0, 2), 16),
-            g: parseInt(full.slice(2, 4), 16),
-            b: parseInt(full.slice(4, 6), 16)
+            r: parseInt(clean.slice(0, 2), 16),
+            g: parseInt(clean.slice(2, 4), 16),
+            b: parseInt(clean.slice(4, 6), 16)
           };
         }
 
         function rgbToHex({ r, g, b }) {
-          const toHex = (v) => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, "0");
+          const clamp = (value) => Math.max(0, Math.min(255, Math.round(value)));
+          const toHex = (value) => clamp(value).toString(16).padStart(2, "0");
           return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        }
+
+        function rgba(hex, alpha) {
+          const rgb = hexToRgb(hex);
+          return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
         }
 
         function mixColor(a, b, t) {
@@ -704,77 +1095,91 @@
           });
         }
 
-        function hashString(text) {
-          let hash = 0;
-          for (let i = 0; i < text.length; i += 1) {
-            hash = (hash << 5) - hash + text.charCodeAt(i);
-            hash |= 0;
-          }
-          return Math.abs(hash);
+        function transformColorForVision(hex, mode) {
+          const matrix = VISION_MATRICES[mode] || VISION_MATRICES.normal;
+          const rgb = hexToRgb(hex);
+          const nR = rgb.r / 255;
+          const nG = rgb.g / 255;
+          const nB = rgb.b / 255;
+
+          return rgbToHex({
+            r: 255 * (matrix[0][0] * nR + matrix[0][1] * nG + matrix[0][2] * nB),
+            g: 255 * (matrix[1][0] * nR + matrix[1][1] * nG + matrix[1][2] * nB),
+            b: 255 * (matrix[2][0] * nR + matrix[2][1] * nG + matrix[2][2] * nB)
+          });
         }
 
-        function hslToHex(h, s, l) {
-          const sat = s / 100;
-          const light = l / 100;
-          const c = (1 - Math.abs(2 * light - 1)) * sat;
-          const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-          const m = light - c / 2;
-          let r = 0;
-          let g = 0;
-          let b = 0;
+        function readStateFromUrl() {
+          const params = new URLSearchParams(window.location.search);
+          state.language = normalizeLanguage(params.get("language") || "r");
+          state.selectedName = (params.get("palette") || "").trim();
+          const visionParam = String(params.get("vision") || "normal").trim().toLowerCase();
+          state.vision = VISION_MATRICES[visionParam] ? visionParam : "normal";
+        }
 
-          if (h < 60) {
-            r = c;
-            g = x;
-          } else if (h < 120) {
-            r = x;
-            g = c;
-          } else if (h < 180) {
-            g = c;
-            b = x;
-          } else if (h < 240) {
-            g = x;
-            b = c;
-          } else if (h < 300) {
-            r = x;
-            b = c;
+        function writeStateToUrl() {
+          const url = new URL(window.location.href);
+          url.searchParams.set("language", state.language);
+          if (state.selectedName) {
+            url.searchParams.set("palette", state.selectedName);
           } else {
-            r = c;
-            b = x;
+            url.searchParams.delete("palette");
+          }
+          if (state.vision !== "normal") {
+            url.searchParams.set("vision", state.vision);
+          } else {
+            url.searchParams.delete("vision");
+          }
+          history.replaceState({}, "", url);
+        }
+
+        function getPaletteByName(name) {
+          const target = String(name || "").trim().toLowerCase();
+          if (!target) return null;
+          return state.palettes.find((palette) => palette.name.toLowerCase() === target) || null;
+        }
+
+        function getSelectedPalette() {
+          return getPaletteByName(state.selectedName);
+        }
+
+        function ensureSelectedPalette() {
+          if (!state.palettes.length) return;
+
+          const selected = getPaletteByName(state.selectedName);
+          if (selected) {
+            state.selectedName = selected.name;
+            return;
           }
 
-          return rgbToHex({ r: (r + m) * 255, g: (g + m) * 255, b: (b + m) * 255 });
+          state.selectedName = state.palettes[0].name;
         }
 
-        function generateBaseColors(name) {
-          const seed = hashString(name || "default");
-          const base = seed % 360;
-          return [
-            hslToHex(base, 70, 24),
-            hslToHex((base + 45) % 360, 76, 42),
-            hslToHex((base + 90) % 360, 80, 84)
-          ];
+        function filteredPalettes() {
+          const query = state.query.trim().toLowerCase();
+          if (!query) return state.palettes;
+
+          return state.palettes.filter((palette) => {
+            const haystack = `${palette.name} ${palette.source} ${palette.kind}`.toLowerCase();
+            return haystack.includes(query);
+          });
         }
 
-        function buildRamp(baseColors, count) {
-          const [dark, mid, light] = baseColors;
-          const colors = [];
-          for (let i = 0; i < count; i += 1) {
-            const t = count <= 1 ? 0 : i / (count - 1);
-            if (t < 0.5) {
-              colors.push(mixColor(dark, mid, t * 2));
-            } else {
-              colors.push(mixColor(mid, light, (t - 0.5) * 2));
-            }
-          }
-          return colors;
+        function getDisplayPaletteColors(palette) {
+          const baseColors = Array.isArray(palette?.palette) && palette.palette.length ? palette.palette : DEFAULT_COLORS;
+          return baseColors.map((color) => transformColorForVision(color, state.vision));
         }
 
-        function normalizeColorArray(colors) {
-          if (!Array.isArray(colors)) return [];
+        function colorAt(colors, index) {
+          if (!colors.length) return DEFAULT_COLORS[index % DEFAULT_COLORS.length];
+          return colors[((index % colors.length) + colors.length) % colors.length];
+        }
+
+        function renderSwatchesHtml(colors, limit) {
           return colors
-            .map((color) => String(color || "").trim())
-            .filter((color) => /^#[0-9a-f]{6,8}$/i.test(color));
+            .slice(0, limit)
+            .map((color) => `<span class="swatch" style="background:${color};"></span>`)
+            .join("");
         }
 
         function resetPalettePillTheme() {
@@ -784,18 +1189,20 @@
           palettePill.style.color = "var(--text)";
           paletteDot.style.background = "var(--green-m)";
           paletteDot.style.boxShadow = "0 0 0 4px var(--green-ring)";
+          if (paletteLabel) {
+            paletteLabel.textContent = "PALETTE: DEFAULT";
+          }
         }
 
         function applyPalettePillTheme(colors) {
           if (!palettePill || !paletteDot) return;
-          const validColors = normalizeColorArray(colors);
-          if (!validColors.length) {
+          if (!colors.length) {
             resetPalettePillTheme();
             return;
           }
 
-          const base = validColors[0];
-          const accent = validColors[Math.min(1, validColors.length - 1)] || base;
+          const base = colors[0];
+          const accent = colors[Math.min(1, colors.length - 1)] || base;
           const bg = mixColor(base, "#ffffff", 0.82);
           const border = mixColor(accent, "#ffffff", 0.58);
           const rgb = hexToRgb(accent);
@@ -820,90 +1227,543 @@
             const position = t * maxIndex;
             const left = Math.floor(position);
             const right = Math.min(maxIndex, left + 1);
-            const localT = position - left;
-            ramp.push(mixColor(colors[left], colors[right], localT));
+            ramp.push(mixColor(colors[left], colors[right], position - left));
           }
           return ramp;
         }
 
-        function applyPaletteToLogo(paletteName) {
-          const key = (paletteName || "").toLowerCase();
-
-          if (!key) {
+        function applyPaletteToLogoWithColors(paletteName, colors) {
+          if (!colors.length) {
             wcPaths.forEach((path) => {
               path.style.fill = path.dataset.originalFill;
             });
             resetPalettePillTheme();
-            paletteLabel.textContent = "PALETTE: DEFAULT";
-            return;
-          }
-
-          const baseColors = PRESET_BASES[key] || generateBaseColors(key);
-          const ramp = buildRamp(baseColors, wcPaths.length);
-
-          wcPaths.forEach((path, idx) => {
-            path.style.fill = ramp[idx];
-          });
-
-          applyPalettePillTheme(baseColors);
-          paletteLabel.textContent = `PALETTE: ${key.toUpperCase()}`;
-        }
-
-        function applyPaletteToLogoWithColors(paletteName, paletteColors) {
-          const colors = normalizeColorArray(paletteColors);
-          if (!colors.length) {
-            applyPaletteToLogo(paletteName);
             return;
           }
 
           const ramp = buildRampFromPalette(colors, wcPaths.length);
-          wcPaths.forEach((path, idx) => {
-            path.style.fill = ramp[idx] || colors[0];
+          wcPaths.forEach((path, index) => {
+            path.style.fill = ramp[index] || colors[0];
           });
 
           applyPalettePillTheme(colors);
-          paletteLabel.textContent = `PALETTE: ${String(paletteName || "CUSTOM").toUpperCase()}`;
-        }
-
-        function syncFromFrameSrc(srcValue) {
-          const state = parseStateFromUrl(srcValue || frame.getAttribute("src") || frame.src);
-          applyPaletteToLogo(state.palette);
-          writePageState(state);
-        }
-
-        const pageState = readPageState();
-        frame.src = buildToolUrl(pageState);
-        syncFromFrameSrc(frame.src);
-
-        window.addEventListener("message", (event) => {
-          if (event.source !== frame.contentWindow) return;
-          const data = event.data || {};
-          if (data.type !== "palette-change") return;
-
-          const nextState = {
-            language: normalizeLanguage(data.language || pageState.language),
-            palette: String(data.paletteName || "").trim()
-          };
-
-          applyPaletteToLogoWithColors(nextState.palette, data.colors);
-          writePageState(nextState);
-        });
-
-        frame.addEventListener("load", () => {
-          let bestUrl = frame.getAttribute("src") || frame.src;
-          try {
-            bestUrl = frame.contentWindow.location.href || bestUrl;
-          } catch (_) {
-            // Cross-origin iframe: not readable.
+          if (paletteLabel) {
+            paletteLabel.textContent = `PALETTE: ${String(paletteName || "DEFAULT").toUpperCase()}`;
           }
-          syncFromFrameSrc(bestUrl);
-        });
+        }
 
-        const observer = new MutationObserver(() => {
-          syncFromFrameSrc(frame.getAttribute("src"));
-        });
+        function interpolatePalette(colors, t) {
+          if (!colors.length) return "#000000";
+          if (colors.length === 1) return colors[0];
+          const clamped = Math.max(0, Math.min(1, t));
+          const maxIndex = colors.length - 1;
+          const pos = clamped * maxIndex;
+          const left = Math.floor(pos);
+          const right = Math.min(maxIndex, left + 1);
+          return mixColor(colors[left], colors[right], pos - left);
+        }
 
-        observer.observe(frame, { attributes: true, attributeFilter: ["src"] });
+        function renderSelection() {
+          const selected = getSelectedPalette();
+          if (!selected) {
+            comboName.textContent = "Nenhuma paleta";
+            comboSwatches.innerHTML = "";
+            metaSource.textContent = "-";
+            metaCount.textContent = "0";
+            metaKind.textContent = "unknown";
+            resetPalettePillTheme();
+            return;
+          }
+
+          const displayColors = getDisplayPaletteColors(selected);
+          comboName.textContent = selected.name;
+          comboSwatches.innerHTML = renderSwatchesHtml(displayColors, 10);
+          metaSource.textContent = selected.source || "source not available";
+          metaCount.textContent = String(selected.palette.length);
+          metaKind.textContent = selected.kind || "unknown";
+
+          applyPaletteToLogoWithColors(selected.name, displayColors);
+        }
+
+        function renderOptions() {
+          const filtered = filteredPalettes();
+          countBadge.textContent = `${filtered.length} palettes`;
+
+          if (!filtered.length) {
+            optionsList.innerHTML = '<div style="padding:12px;color:#6a6a66;font-size:12px;">Nenhuma paleta encontrada.</div>';
+            return;
+          }
+
+          const visible = filtered.slice(0, state.optionLimit);
+          const selectedName = state.selectedName.toLowerCase();
+
+          const rows = visible
+            .map((palette) => {
+              const active = palette.name.toLowerCase() === selectedName;
+              const swatches = renderSwatchesHtml(getDisplayPaletteColors(palette), 8);
+              const kind = palette.kind || "unknown";
+              const source = palette.source || "source not available";
+              return `
+                <button
+                  type="button"
+                  class="option-item${active ? " active" : ""}"
+                  data-name="${escapeAttr(palette.name)}"
+                  role="option"
+                  aria-selected="${active ? "true" : "false"}"
+                >
+                  <span class="option-name">${escapeHtml(palette.name)}</span>
+                  <div class="swatch-row">${swatches}</div>
+                  <span class="option-meta">${palette.palette.length} colors • ${escapeHtml(kind)}</span>
+                  <span class="option-meta">${escapeHtml(source)}</span>
+                </button>
+              `;
+            })
+            .join("");
+
+          const moreButton =
+            filtered.length > visible.length
+              ? `<button type="button" class="load-more" id="loadMoreOptions">Carregar mais (${filtered.length - visible.length})</button>`
+              : "";
+
+          optionsList.innerHTML = `${rows}${moreButton}`;
+
+          optionsList.querySelectorAll(".option-item").forEach((button) => {
+            button.addEventListener("click", () => {
+              const nextName = button.dataset.name || "";
+              if (!nextName) return;
+              selectPalette(nextName);
+              closeDropdown();
+            });
+          });
+
+          const loadMoreButton = document.getElementById("loadMoreOptions");
+          if (loadMoreButton) {
+            loadMoreButton.addEventListener("click", () => {
+              state.optionLimit += PAGE_SIZE;
+              renderOptions();
+            });
+          }
+        }
+
+        function renderEmptyPlots(message) {
+          Object.values(plotSvgs).forEach((svg) => {
+            svg.innerHTML = `
+              <rect x="12" y="12" width="296" height="176" rx="8" fill="#fafaf8" stroke="#e8e7e3"></rect>
+              <text x="160" y="104" text-anchor="middle" font-size="12" fill="#6a6a66" font-family="Outfit, sans-serif">
+                ${escapeHtml(message)}
+              </text>
+            `;
+          });
+        }
+
+        function axisBase() {
+          return `
+            <line x1="30" y1="172" x2="296" y2="172" stroke="#d8d7d1" stroke-width="1"></line>
+            <line x1="30" y1="24" x2="30" y2="172" stroke="#d8d7d1" stroke-width="1"></line>
+          `;
+        }
+
+        function renderBarPlot(colors) {
+          const values = [7, 4, 8, 5, 6, 3];
+          const max = 9;
+          const left = 34;
+          const baseline = 168;
+          const top = 22;
+          const available = 258;
+          const step = available / values.length;
+          const barWidth = step * 0.68;
+
+          const bars = values
+            .map((value, index) => {
+              const h = ((baseline - top) * value) / max;
+              const x = left + index * step + (step - barWidth) / 2;
+              const y = baseline - h;
+              return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${barWidth.toFixed(2)}" height="${h.toFixed(2)}" rx="4" fill="${colorAt(colors, index)}"></rect>`;
+            })
+            .join("");
+
+          return `${axisBase()}${bars}`;
+        }
+
+        function renderLinePlot(colors) {
+          const values = [2, 4, 3, 6, 5, 8, 7, 9];
+          const left = 34;
+          const right = 296;
+          const top = 26;
+          const bottom = 168;
+          const max = 10;
+          const step = (right - left) / (values.length - 1);
+
+          const points = values.map((value, index) => {
+            const x = left + index * step;
+            const y = bottom - ((bottom - top) * value) / max;
+            return { x, y };
+          });
+
+          const linePath = points.map((point, idx) => `${idx ? "L" : "M"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
+          const areaPath = `${linePath} L ${right.toFixed(2)} ${bottom} L ${left.toFixed(2)} ${bottom} Z`;
+          const marks = points
+            .map(
+              (point, index) =>
+                `<circle cx="${point.x.toFixed(2)}" cy="${point.y.toFixed(2)}" r="4.2" fill="${colorAt(
+                  colors,
+                  index
+                )}" stroke="#ffffff" stroke-width="1.5"></circle>`
+            )
+            .join("");
+
+          return `
+            ${axisBase()}
+            <path d="${areaPath}" fill="${rgba(colorAt(colors, 0), 0.18)}"></path>
+            <path d="${linePath}" fill="none" stroke="${colorAt(colors, 1)}" stroke-width="3"></path>
+            ${marks}
+          `;
+        }
+
+        function renderScatterPlot(colors) {
+          const points = Array.from({ length: 30 }, (_, index) => ({
+            x: 34 + ((index * 47) % 252),
+            y: 28 + ((index * 61 + 17) % 136),
+            r: 3 + (index % 3)
+          }));
+
+          const circles = points
+            .map(
+              (point, index) =>
+                `<circle cx="${point.x}" cy="${point.y}" r="${point.r}" fill="${colorAt(colors, index)}" fill-opacity="0.82"></circle>`
+            )
+            .join("");
+
+          return `${axisBase()}${circles}`;
+        }
+
+        function renderBoxPlot(colors) {
+          const groups = [
+            { min: 18, q1: 32, med: 44, q3: 57, max: 72 },
+            { min: 15, q1: 28, med: 36, q3: 50, max: 66 },
+            { min: 22, q1: 35, med: 46, q3: 60, max: 78 },
+            { min: 12, q1: 24, med: 40, q3: 54, max: 70 }
+          ];
+          const left = 52;
+          const step = 60;
+          const y = (value) => 170 - value * 1.8;
+
+          const boxes = groups
+            .map((group, index) => {
+              const x = left + index * step;
+              const boxTop = y(group.q3);
+              const boxBottom = y(group.q1);
+              const median = y(group.med);
+              const minY = y(group.min);
+              const maxY = y(group.max);
+              const color = colorAt(colors, index);
+              return `
+                <line x1="${x}" y1="${minY}" x2="${x}" y2="${maxY}" stroke="${color}" stroke-width="2"></line>
+                <line x1="${x - 12}" y1="${minY}" x2="${x + 12}" y2="${minY}" stroke="${color}" stroke-width="2"></line>
+                <line x1="${x - 12}" y1="${maxY}" x2="${x + 12}" y2="${maxY}" stroke="${color}" stroke-width="2"></line>
+                <rect x="${x - 16}" y="${boxTop}" width="32" height="${boxBottom - boxTop}" fill="${rgba(
+                  color,
+                  0.24
+                )}" stroke="${color}" stroke-width="2"></rect>
+                <line x1="${x - 16}" y1="${median}" x2="${x + 16}" y2="${median}" stroke="${color}" stroke-width="2"></line>
+              `;
+            })
+            .join("");
+
+          return `${axisBase()}${boxes}`;
+        }
+
+        function renderHistogram(colors) {
+          const bins = [2, 5, 6, 9, 8, 6, 4, 2];
+          const max = 10;
+          const left = 34;
+          const baseline = 168;
+          const top = 26;
+          const width = 262;
+          const barW = width / bins.length;
+
+          const bars = bins
+            .map((value, index) => {
+              const h = ((baseline - top) * value) / max;
+              const x = left + index * barW + 1;
+              const y = baseline - h;
+              return `<rect x="${x.toFixed(2)}" y="${y.toFixed(2)}" width="${(barW - 2).toFixed(2)}" height="${h.toFixed(
+                2
+              )}" fill="${colorAt(colors, index)}"></rect>`;
+            })
+            .join("");
+
+          return `${axisBase()}${bars}`;
+        }
+
+        function renderHeatmap(colors) {
+          const rows = 5;
+          const cols = 6;
+          const left = 34;
+          const top = 28;
+          const cw = 40;
+          const ch = 28;
+
+          const cells = [];
+          for (let row = 0; row < rows; row += 1) {
+            for (let col = 0; col < cols; col += 1) {
+              const x = left + col * cw;
+              const y = top + row * ch;
+              const value = (Math.sin((row + 1) * (col + 2)) + 1) / 2;
+              cells.push(
+                `<rect x="${x}" y="${y}" width="${cw - 2}" height="${ch - 2}" rx="4" fill="${interpolatePalette(
+                  colors,
+                  value
+                )}"></rect>`
+              );
+            }
+          }
+          return cells.join("");
+        }
+
+        function renderAreaPlot(colors) {
+          const series = [
+            [2, 3, 4, 5, 6, 6, 7],
+            [1, 2, 2, 3, 2, 3, 2],
+            [1, 1, 2, 1, 2, 1, 1]
+          ];
+          const left = 34;
+          const right = 296;
+          const top = 26;
+          const bottom = 168;
+          const max = 8;
+          const step = (right - left) / (series[0].length - 1);
+
+          const areas = series
+            .map((row, rowIndex) => {
+              const points = row.map((value, idx) => {
+                const x = left + idx * step;
+                const y = bottom - ((bottom - top) * value) / max;
+                return { x, y };
+              });
+
+              const line = points.map((point, idx) => `${idx ? "L" : "M"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
+              const area = `${line} L ${right} ${bottom} L ${left} ${bottom} Z`;
+              const color = colorAt(colors, rowIndex);
+              return `
+                <path d="${area}" fill="${rgba(color, 0.2)}"></path>
+                <path d="${line}" fill="none" stroke="${color}" stroke-width="2.5"></path>
+              `;
+            })
+            .join("");
+
+          return `${axisBase()}${areas}`;
+        }
+
+        function polarToCartesian(cx, cy, radius, angleDeg) {
+          const angleRad = ((angleDeg - 90) * Math.PI) / 180;
+          return {
+            x: cx + radius * Math.cos(angleRad),
+            y: cy + radius * Math.sin(angleRad)
+          };
+        }
+
+        function donutSegmentPath(cx, cy, outerRadius, innerRadius, startAngle, endAngle) {
+          const outerStart = polarToCartesian(cx, cy, outerRadius, startAngle);
+          const outerEnd = polarToCartesian(cx, cy, outerRadius, endAngle);
+          const innerEnd = polarToCartesian(cx, cy, innerRadius, endAngle);
+          const innerStart = polarToCartesian(cx, cy, innerRadius, startAngle);
+          const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+
+          return [
+            `M ${outerStart.x.toFixed(2)} ${outerStart.y.toFixed(2)}`,
+            `A ${outerRadius} ${outerRadius} 0 ${largeArc} 1 ${outerEnd.x.toFixed(2)} ${outerEnd.y.toFixed(2)}`,
+            `L ${innerEnd.x.toFixed(2)} ${innerEnd.y.toFixed(2)}`,
+            `A ${innerRadius} ${innerRadius} 0 ${largeArc} 0 ${innerStart.x.toFixed(2)} ${innerStart.y.toFixed(2)}`,
+            "Z"
+          ].join(" ");
+        }
+
+        function renderDonutPlot(colors) {
+          const values = [22, 18, 15, 12, 10, 8];
+          const total = values.reduce((acc, value) => acc + value, 0);
+          let angle = 0;
+          const cx = 160;
+          const cy = 100;
+          const outer = 70;
+          const inner = 34;
+
+          const paths = values
+            .map((value, index) => {
+              const span = (value / total) * 360;
+              const start = angle;
+              const end = angle + span;
+              angle = end;
+              return `<path d="${donutSegmentPath(cx, cy, outer, inner, start, end)}" fill="${colorAt(colors, index)}"></path>`;
+            })
+            .join("");
+
+          return `
+            ${paths}
+            <circle cx="${cx}" cy="${cy}" r="${inner - 1}" fill="#ffffff"></circle>
+            <text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="13" font-weight="700" fill="#6a6a66">100%</text>
+          `;
+        }
+
+        function renderLollipopPlot(colors) {
+          const values = [4, 9, 6, 8, 5, 7, 3];
+          const max = 10;
+          const left = 38;
+          const bottom = 170;
+          const top = 24;
+          const step = 36;
+
+          const items = values
+            .map((value, index) => {
+              const x = left + index * step;
+              const y = bottom - ((bottom - top) * value) / max;
+              const color = colorAt(colors, index);
+              return `
+                <line x1="${x}" y1="${bottom}" x2="${x}" y2="${y}" stroke="${rgba(color, 0.55)}" stroke-width="3"></line>
+                <circle cx="${x}" cy="${y}" r="7" fill="${color}" stroke="#ffffff" stroke-width="2"></circle>
+              `;
+            })
+            .join("");
+
+          return `${axisBase()}${items}`;
+        }
+
+        function renderPlots() {
+          const selected = getSelectedPalette();
+          const colors = getDisplayPaletteColors(selected);
+          const palette = colors.length ? colors : DEFAULT_COLORS;
+
+          plotSvgs.bar.innerHTML = renderBarPlot(palette);
+          plotSvgs.line.innerHTML = renderLinePlot(palette);
+          plotSvgs.scatter.innerHTML = renderScatterPlot(palette);
+          plotSvgs.box.innerHTML = renderBoxPlot(palette);
+          plotSvgs.hist.innerHTML = renderHistogram(palette);
+          plotSvgs.heat.innerHTML = renderHeatmap(palette);
+          plotSvgs.area.innerHTML = renderAreaPlot(palette);
+          plotSvgs.donut.innerHTML = renderDonutPlot(palette);
+          plotSvgs.lollipop.innerHTML = renderLollipopPlot(palette);
+        }
+
+        function openDropdown() {
+          dropdown.hidden = false;
+          comboButton.setAttribute("aria-expanded", "true");
+          searchInput.focus();
+          searchInput.select();
+        }
+
+        function closeDropdown() {
+          dropdown.hidden = true;
+          comboButton.setAttribute("aria-expanded", "false");
+        }
+
+        function selectPalette(nextName) {
+          const selected = getPaletteByName(nextName);
+          if (!selected) return;
+          state.selectedName = selected.name;
+          writeStateToUrl();
+          renderSelection();
+          renderOptions();
+          renderPlots();
+        }
+
+        function bindEvents() {
+          comboButton.addEventListener("click", () => {
+            if (dropdown.hidden) {
+              openDropdown();
+            } else {
+              closeDropdown();
+            }
+          });
+
+          searchInput.addEventListener("input", () => {
+            state.query = searchInput.value;
+            state.optionLimit = PAGE_SIZE;
+            renderOptions();
+          });
+
+          visionMode.addEventListener("change", () => {
+            const nextMode = String(visionMode.value || "normal").toLowerCase();
+            state.vision = VISION_MATRICES[nextMode] ? nextMode : "normal";
+            writeStateToUrl();
+            renderSelection();
+            renderOptions();
+            renderPlots();
+          });
+
+          document.addEventListener("click", (event) => {
+            if (!comboWrap.contains(event.target)) {
+              closeDropdown();
+            }
+          });
+
+          document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+              closeDropdown();
+            }
+          });
+        }
+
+        async function loadPalettes() {
+          let raw;
+          try {
+            const response = await fetch(DATA_URL, { cache: "force-cache" });
+            if (!response.ok) {
+              throw new Error(`Could not load ${DATA_URL}: ${response.status}`);
+            }
+            raw = await response.json();
+          } catch (error) {
+            if (Array.isArray(window.__LOCAL_PALETTES__) && window.__LOCAL_PALETTES__.length) {
+              raw = window.__LOCAL_PALETTES__;
+            } else {
+              throw error;
+            }
+          }
+
+          state.palettes = raw
+            .map((item) => ({
+              name: String(item.name || "").trim(),
+              source: String(item.source || "").trim(),
+              kind: String(item.kind || "").trim(),
+              palette: Array.isArray(item.palette) ? item.palette.map(normalizeHex).filter(Boolean) : []
+            }))
+            .filter((item) => item.name && item.palette.length);
+
+          state.palettes.sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        function handleLoadError(error) {
+          countBadge.textContent = "Erro";
+          comboName.textContent = "Falha ao carregar";
+          comboSwatches.innerHTML = "";
+          metaSource.textContent = String(error && error.message ? error.message : error || "Erro desconhecido");
+          metaCount.textContent = "0";
+          metaKind.textContent = "error";
+          optionsList.innerHTML =
+            '<div style="padding:12px;color:#6a6a66;font-size:12px;">Erro ao carregar as paletas locais. Rode <code>python3 -m http.server 8000</code> e abra via http://localhost:8000.</div>';
+          renderEmptyPlots("Sem dados");
+          resetPalettePillTheme();
+        }
+
+        async function init() {
+          readStateFromUrl();
+          visionMode.value = state.vision;
+          bindEvents();
+
+          try {
+            await loadPalettes();
+          } catch (error) {
+            handleLoadError(error);
+            return;
+          }
+
+          ensureSelectedPalette();
+          writeStateToUrl();
+          renderSelection();
+          renderOptions();
+          renderPlots();
+        }
+
+        init();
       })();
     </script>
   </body>
