@@ -38,6 +38,8 @@
         --green-m: #1647a3;
         --green-lt: #d1ddfa;
         --green-ring: rgba(22, 71, 163, 0.15);
+        --palette-pill-bg: var(--green-bg);
+        --palette-pill-border: #c4d8ff;
         --studio-accent: #1647a3;
         --studio-accent-hover: #123b87;
         --studio-accent-text: #ffffff;
@@ -236,8 +238,8 @@
         gap: 8px;
         padding: 7px 12px;
         border-radius: 999px;
-        border: 1px solid #c4d8ff;
-        background: var(--green-bg);
+        border: 1px solid var(--palette-pill-border);
+        background: var(--palette-pill-bg);
         color: var(--text);
         font-size: 12px;
         font-weight: 700;
@@ -409,6 +411,16 @@
         grid-template-columns: minmax(0, 1fr) 240px;
         gap: 12px;
         align-items: start;
+      }
+
+      .workbench-actions {
+        margin-top: 10px;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .workbench-export-btn {
+        min-height: 36px;
       }
 
       .combo-wrap {
@@ -747,14 +759,15 @@
       }
 
       .studio-btn.primary {
-        background: var(--studio-accent);
-        border-color: var(--studio-accent);
-        color: var(--studio-accent-text);
+        background: var(--palette-pill-bg);
+        border-color: var(--palette-pill-border);
+        color: #0e0e0d;
       }
 
       .studio-btn.primary:hover {
-        background: var(--studio-accent-hover);
-        border-color: var(--studio-accent-hover);
+        background: var(--palette-pill-bg);
+        border-color: var(--palette-pill-border);
+        color: #0e0e0d;
       }
 
       .studio-btn.danger {
@@ -810,15 +823,15 @@
       .studio-message {
         font-size: 12px;
         min-height: 18px;
-        color: var(--sub);
+        color: #0e0e0d;
       }
 
       .studio-message.is-error {
-        color: var(--red);
+        color: #0e0e0d;
       }
 
       .studio-message.is-success {
-        color: var(--studio-accent);
+        color: #0e0e0d;
       }
 
       .studio-library-head {
@@ -978,6 +991,14 @@
 
         .workbench {
           padding: 12px;
+        }
+
+        .workbench-actions {
+          justify-content: stretch;
+        }
+
+        .workbench-export-btn {
+          width: 100%;
         }
 
         .combo-name {
@@ -1296,6 +1317,12 @@
             </div>
           </div>
 
+          <div class="workbench-actions">
+            <button type="button" class="studio-btn primary workbench-export-btn" id="workbenchExportSelected">
+              Export selected JSON
+            </button>
+          </div>
+
           <div class="plot-grid">
             <article class="plot-card">
               <h3 class="plot-title">Bar Plot</h3>
@@ -1383,9 +1410,7 @@
                 </div>
               </div>
 
-              <ul id="studioDraftList" class="studio-draft-list">
-                <li class="studio-empty">Your draft has no colors yet.</li>
-              </ul>
+              <ul id="studioDraftList" class="studio-draft-list"></ul>
 
               <div id="studioMessage" class="studio-message" role="status" aria-live="polite"></div>
 
@@ -1492,6 +1517,7 @@
         const studioClearBtn = document.getElementById("studioClearDraft");
         const studioCollection = document.getElementById("studioCollection");
         const studioClearLibraryBtn = document.getElementById("studioClearLibrary");
+        const workbenchExportBtn = document.getElementById("workbenchExportSelected");
 
         const plotSvgs = {
           bar: document.getElementById("plot-bar"),
@@ -1965,12 +1991,18 @@
         }
 
         function resetPalettePillTheme() {
+          const rootStyle = document.documentElement?.style;
+          if (rootStyle) {
+            rootStyle.setProperty("--palette-pill-bg", "var(--green-bg)");
+            rootStyle.setProperty("--palette-pill-border", "#c4d8ff");
+          }
+
           resetCountBadgeTheme();
           resetHeroLogoTheme();
           resetStudioTheme();
           if (!palettePill || !paletteDot) return;
-          palettePill.style.background = "var(--green-bg)";
-          palettePill.style.borderColor = "#c4d8ff";
+          palettePill.style.removeProperty("background");
+          palettePill.style.removeProperty("border-color");
           palettePill.style.color = "var(--text)";
           paletteDot.style.background = "var(--green-m)";
           paletteDot.style.boxShadow = "0 0 0 4px var(--green-ring)";
@@ -1997,8 +2029,12 @@
           const border = mixColor(accent, "#ffffff", 0.58);
           const rgb = hexToRgb(accent);
 
-          palettePill.style.background = bg;
-          palettePill.style.borderColor = border;
+          const rootStyle = document.documentElement?.style;
+          if (rootStyle) {
+            rootStyle.setProperty("--palette-pill-bg", bg);
+            rootStyle.setProperty("--palette-pill-border", border);
+          }
+
           palettePill.style.color = "var(--text)";
           paletteDot.style.background = accent;
           paletteDot.style.boxShadow = `0 0 0 4px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.24)`;
@@ -2102,7 +2138,7 @@
           }
 
           if (!state.draftColors.length) {
-            studioDraftList.innerHTML = '<li class="studio-empty">Your draft has no colors yet.</li>';
+            studioDraftList.innerHTML = "";
             return;
           }
 
@@ -2212,7 +2248,10 @@
         }
 
         function exportPaletteByNameAndColors(name, colors) {
-          const safeName = normalizePaletteName(name, "my-palette").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+          const safeName = normalizePaletteName(name, "my-palette")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "");
           const safeColors = uniqueHexColors(colors, MAX_CUSTOM_COLORS);
           if (!safeColors.length) {
             setStudioMessage("Add colors before exporting.", "error");
@@ -2226,6 +2265,34 @@
             kind: "custom"
           });
           setStudioMessage("JSON exported successfully.", "success");
+        }
+
+        function exportSelectedPaletteFromWorkbench() {
+          const selected = getSelectedPalette();
+          if (!selected) {
+            setStudioMessage("Select a palette before exporting JSON.", "error");
+            return;
+          }
+
+          const colors = Array.isArray(selected.palette) ? selected.palette.map(normalizeHex).filter(Boolean) : [];
+          if (!colors.length) {
+            setStudioMessage("Selected palette has no colors to export.", "error");
+            return;
+          }
+
+          const safeName = normalizePaletteName(selected.name, "selected-palette")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "");
+
+          downloadPaletteJson(`${safeName || "selected-palette"}.json`, {
+            name: normalizePaletteName(selected.name, "Selected palette"),
+            palette: colors,
+            source: String(selected.source || ""),
+            kind: String(selected.kind || ""),
+            origin: String(selected.origin || "base")
+          });
+          setStudioMessage(`JSON exported: ${selected.name}.`, "success");
         }
 
         function saveDraftPalette() {
@@ -2718,6 +2785,10 @@
             renderSelection();
             renderOptions();
             renderPlots();
+          });
+
+          workbenchExportBtn?.addEventListener("click", () => {
+            exportSelectedPaletteFromWorkbench();
           });
 
           document.addEventListener("click", (event) => {
