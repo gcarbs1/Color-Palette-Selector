@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Example Palette A",
+    "palette": ["#112233", "#445566", "#778899"],
+    "source": "Example Source",
+    "kind": "qualitative"
+  },
+  {
+    "name": "Example Palette B",
+    "palette": ["#AABBCC", "#DDEEFF", "#334455"],
+    "source": "Example Source",
+    "kind": "sequential"
+  }
+]

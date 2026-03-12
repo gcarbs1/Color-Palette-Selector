@@ -20,6 +20,9 @@ It now includes `Palette Studio`, an area to:
 │   ├── palette_coords.json
 │   ├── palette_coords.js
 │   ├── palette_space_preview.png
+│   ├── extra/
+│   │   ├── README.md
+│   │   └── _template.json
 │   └── source/
 │       └── dataviz-color-finder-page.js
 ├── scripts/
@@ -58,7 +61,62 @@ To refresh the remote snapshot and regenerate:
 python3 scripts/extract_palettes.py --refresh-source
 ```
 
+To fetch an extra large source from Lospec and include it:
+
+```bash
+python3 scripts/fetch_lospec_palettes.py
+python3 scripts/extract_palettes.py --dedupe-by name+signature
+```
+
+### Add More Sources (Without Repetition)
+
+`extract_palettes.py` can merge additional JSON files and remove duplicates.
+
+Fast path:
+
+1. Copy `data/extra/_template.json` to a new file (example: `data/extra/my_source.json`)
+2. Add your palettes
+3. Run:
+
+```bash
+python3 scripts/extract_palettes.py --dedupe-by name+signature
+```
+
+`data/extra/*.json` is loaded automatically (files starting with `_` or `.` are ignored).
+
+Supported extra JSON formats:
+- a top-level list of palettes
+- an object with a `palettes` list
+
+Each palette item should contain: `name`, `palette` (hex list), `source`, `kind`.
+
+Example:
+
+```bash
+python3 scripts/extract_palettes.py \
+  --extra-json data/extra/my_source_a.json \
+  --extra-json data/extra/my_source_b.json \
+  --dedupe-by name+signature
+```
+
+Extra options:
+- `--extra-dir path/to/folder`: load all `.json` files from an additional folder
+- `--no-auto-extra-dir`: disable the automatic scan of `data/extra`
+
+Deduplication modes:
+- `none`: keeps everything
+- `name`: removes repeated palette names (case-insensitive)
+- `signature`: removes repeated normalized color sequences
+- `name+signature`: removes duplicates if either name or color signature repeats
+
+Default mode is `none` to preserve the full imported dataset.
+
 ## Palette Space Coordinates
 
 - `data/palette_coords.json` and `data/palette_coords.js` store the 2D coordinates and palette metadata.
 - The notebook `notebooks/palette_similarity.ipynb` documents the similarity pipeline.
+- Fast rebuild command (recommended for larger datasets):
+
+```bash
+./.venv/bin/python scripts/build_palette_coords_fast.py
+```
