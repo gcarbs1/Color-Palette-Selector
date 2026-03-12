@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build fast, perceptual palette-space coordinates using OKLab histograms."""
+"""Build fast, perceptual palette-space coordinates with compact OKLab features."""
 
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ DEFAULT_PALETTES = ROOT_DIR / "data/palettes.json"
 DEFAULT_COORDS_JSON = ROOT_DIR / "data/palette_coords.json"
 DEFAULT_COORDS_JS = ROOT_DIR / "data/palette_coords.js"
 MAX_COLORS_PER_PALETTE = 48
+COORDS_PREVIEW_COLORS = 14
 
 
 def _parse_args() -> argparse.Namespace:
@@ -91,26 +92,43 @@ def _palette_to_oklab(colors: list[str]) -> np.ndarray:
 def _palette_descriptor(colors: list[str]) -> np.ndarray:
     sampled = _sample_colors(colors)
     arr = _palette_to_oklab(sampled)
+    L = arr[:, 0]
+    A = arr[:, 1]
+    B = arr[:, 2]
 
-    # 3D perceptual color distribution (fast + robust to palette order).
-    hist, _ = np.histogramdd(
-        arr,
-        bins=(8, 8, 8),
-        range=((0.0, 1.0), (-0.45, 0.45), (-0.45, 0.45)),
+    chroma = np.sqrt(A * A + B * B)
+    hue = np.arctan2(B, A)
+    hue = np.where(hue < 0, hue + 2 * np.pi, hue)
+
+    # Simple but expressive shape features.
+    means = np.array([L.mean(), A.mean(), B.mean()], dtype=np.float32)
+    stds = np.array([L.std(), A.std(), B.std()], dtype=np.float32)
+    lch_quant = np.array(
+        [
+            np.percentile(L, 15),
+            np.percentile(L, 50),
+            np.percentile(L, 85),
+            np.percentile(chroma, 15),
+            np.percentile(chroma, 50),
+            np.percentile(chroma, 85),
+        ],
+        dtype=np.float32,
     )
-    hist = hist.astype(np.float32).reshape(-1)
-    hist_sum = float(hist.sum())
-    if hist_sum > 0:
-        hist /= hist_sum
-    hist = np.sqrt(hist)  # Hellinger transform
 
-    # Compact moments to stabilize proximity among similarly distributed palettes.
-    means = arr.mean(axis=0)
-    stds = arr.std(axis=0)
+    hue_hist, _ = np.histogram(hue, bins=12, range=(0.0, 2 * np.pi), weights=(chroma + 1e-4))
+    hue_hist = hue_hist.astype(np.float32)
+    hue_sum = float(hue_hist.sum())
+    if hue_sum > 0:
+        hue_hist /= hue_sum
+
+    light_hist, _ = np.histogram(L, bins=6, range=(0.0, 1.0))
+    light_hist = light_hist.astype(np.float32)
+    light_sum = float(light_hist.sum())
+    if light_sum > 0:
+        light_hist /= light_sum
+
     size = np.array([math.log1p(len(sampled))], dtype=np.float32)
-    moments = np.concatenate([means, stds, size], dtype=np.float32)
-
-    return np.concatenate([hist, moments], dtype=np.float32)
+    return np.concatenate([means, stds, lch_quant, hue_hist, light_hist, size], dtype=np.float32)
 
 
 def _minmax_to_unit(arr: np.ndarray) -> np.ndarray:
@@ -158,8 +176,8 @@ def main() -> int:
     scaler = StandardScaler()
     Xs = scaler.fit_transform(X)
 
-    # PCA keeps UMAP fast and stable with high-dimensional histograms.
-    n_components = min(40, Xs.shape[1], max(2, Xs.shape[0] - 1))
+    # A small PCA projection keeps UMAP very fast while preserving neighborhood structure.
+    n_components = min(16, Xs.shape[1], max(2, Xs.shape[0] - 1))
     Xp = PCA(n_components=n_components, random_state=args.seed).fit_transform(Xs)
 
     method = "UMAP"
@@ -191,7 +209,7 @@ def main() -> int:
                 "y": round(float(y_norm[i]), 4),
                 "kind": rec["kind"],
                 "source": rec["source"],
-                "colors": rec["colors"],
+                "colors": rec["colors"][:COORDS_PREVIEW_COLORS],
             }
         )
 

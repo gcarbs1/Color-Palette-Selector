@@ -1596,11 +1596,11 @@
       </section>
     </main>
 
-    <script src="./data/palette_coords.js"></script>
-    <script src="./data/palettes.js"></script>
     <script>
       (function () {
         const DATA_URL = "./data/palettes.json";
+        const DATA_FALLBACK_SCRIPT = "./data/palettes.js";
+        const COORDS_FALLBACK_SCRIPT = "./data/palette_coords.js";
         const CUSTOM_STORAGE_KEY = "palette_explorer_custom_palettes_v1";
         const MAX_CUSTOM_COLORS = 20;
         const PAGE_SIZE = 180;
@@ -1700,6 +1700,33 @@
         wcPaths.forEach((path) => {
           path.dataset.originalFill = path.getAttribute("fill") || "#0f1b3f";
         });
+
+        const loadedScriptCache = new Set();
+        function loadScriptOnce(src) {
+          const key = String(src || "").trim();
+          if (!key) {
+            return Promise.reject(new Error("Missing script src"));
+          }
+          if (loadedScriptCache.has(key)) {
+            return Promise.resolve();
+          }
+          if (document.querySelector(`script[data-fallback-src="${key}"]`)) {
+            loadedScriptCache.add(key);
+            return Promise.resolve();
+          }
+          return new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = key;
+            script.async = true;
+            script.dataset.fallbackSrc = key;
+            script.onload = () => {
+              loadedScriptCache.add(key);
+              resolve();
+            };
+            script.onerror = () => reject(new Error(`Failed to load fallback script: ${key}`));
+            document.head.appendChild(script);
+          });
+        }
 
         function normalizeLanguage(value) {
           return value === "python" ? "python" : "r";
@@ -3179,6 +3206,11 @@
             }
             raw = await response.json();
           } catch (error) {
+            try {
+              await loadScriptOnce(DATA_FALLBACK_SCRIPT);
+            } catch (_) {
+              // Keep original error flow below.
+            }
             if (Array.isArray(window.__LOCAL_PALETTES__) && window.__LOCAL_PALETTES__.length) {
               raw = window.__LOCAL_PALETTES__;
             } else {
@@ -3440,6 +3472,11 @@
             if (!resp.ok) throw new Error("fetch failed");
             raw = await resp.json();
           } catch (_) {
+            try {
+              await loadScriptOnce(COORDS_FALLBACK_SCRIPT);
+            } catch (_) {
+              // Keep original fallback flow below.
+            }
             if (Array.isArray(window.__PALETTE_COORDS__) && window.__PALETTE_COORDS__.length) {
               raw = window.__PALETTE_COORDS__;
             } else {
@@ -3622,6 +3659,8 @@
 
           // scroll to zoom
           psCanvas.addEventListener("wheel", (e) => {
+            // Allow normal page scrolling; reserve canvas zoom for ctrl/cmd + wheel.
+            if (!(e.ctrlKey || e.metaKey)) return;
             e.preventDefault();
             const { cx, cy } = canvasCoords(e.clientX, e.clientY);
             zoomAtPoint(cx, cy, e.deltaY < 0 ? 1.15 : 1 / 1.15);
