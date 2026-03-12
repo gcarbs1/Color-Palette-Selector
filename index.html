@@ -423,6 +423,74 @@
         min-height: 36px;
       }
 
+      .workbench-filter-row {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 12px;
+        align-items: end;
+      }
+
+      .control-number {
+        width: 100%;
+        min-height: 46px;
+        border: 1px solid #d8d7d1;
+        border-radius: 12px;
+        background: #fff;
+        color: var(--text);
+        font: 500 13px/1.2 "Outfit", sans-serif;
+        padding: 0 11px;
+      }
+
+      .control-number:focus {
+        outline: none;
+        border-color: #8eb0ef;
+        box-shadow: 0 0 0 4px rgba(22, 71, 163, 0.12);
+      }
+
+      .color-filter-inline {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .color-picker-box {
+        width: 44px;
+        min-width: 44px;
+        height: 40px;
+        border: 1px solid #d8d7d1;
+        border-radius: 10px;
+        background: #fff;
+        padding: 3px;
+        cursor: pointer;
+      }
+
+      .color-picker-box:focus {
+        outline: none;
+        border-color: #8eb0ef;
+        box-shadow: 0 0 0 4px rgba(22, 71, 163, 0.12);
+      }
+
+      .color-picker-box::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+
+      .color-picker-box::-webkit-color-swatch {
+        border: none;
+        border-radius: 7px;
+      }
+
+      .color-picker-box::-moz-color-swatch {
+        border: none;
+        border-radius: 7px;
+      }
+
+      .color-filter-hex {
+        max-width: 140px;
+        text-transform: uppercase;
+      }
+
       .combo-wrap {
         position: relative;
       }
@@ -935,6 +1003,10 @@
           grid-template-columns: 1fr;
         }
 
+        .workbench-filter-row {
+          grid-template-columns: 1fr;
+        }
+
         .plot-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
@@ -999,6 +1071,10 @@
 
         .workbench-export-btn {
           width: 100%;
+        }
+
+        .color-filter-hex {
+          max-width: none;
         }
 
         .combo-name {
@@ -1317,6 +1393,41 @@
             </div>
           </div>
 
+          <div class="workbench-filter-row">
+            <div class="control-group">
+              <label class="control-label" for="maxColorsFilter">Max Colors In Palette</label>
+              <input
+                id="maxColorsFilter"
+                class="control-number"
+                type="number"
+                min="1"
+                step="1"
+                inputmode="numeric"
+              />
+            </div>
+
+            <div class="control-group">
+              <label class="control-label" for="workbenchColorFilterHex">Similar Color (HEX)</label>
+              <div class="color-filter-inline">
+                <input
+                  id="workbenchColorFilterPicker"
+                  class="color-picker-box"
+                  type="color"
+                  value="#dfe3ce"
+                  aria-label="Pick filter color"
+                />
+                <input
+                  id="workbenchColorFilterHex"
+                  class="studio-input color-filter-hex"
+                  type="text"
+                  placeholder="#DFE3CE"
+                  autocomplete="off"
+                />
+                <button type="button" class="studio-btn" id="workbenchColorFilterClear">Clear</button>
+              </div>
+            </div>
+          </div>
+
           <div class="workbench-actions">
             <button type="button" class="studio-btn primary workbench-export-btn" id="workbenchExportSelected">
               Export selected JSON
@@ -1391,7 +1502,7 @@
                   class="studio-input"
                   type="text"
                   maxlength="60"
-                  placeholder="e.g. Summer Campaign"
+                  placeholder="viridis, plasma, inferno"
                 />
               </div>
 
@@ -1402,9 +1513,10 @@
                     id="studioColorInput"
                     class="studio-input studio-color-input"
                     type="text"
-                    placeholder="#1F77B4"
+                    placeholder="#DFE3CE"
                     autocomplete="off"
                   />
+                  <input id="studioColorPicker" class="color-picker-box" type="color" value="#dfe3ce" aria-label="Pick color" />
                   <button type="button" class="studio-btn" id="studioAddColor">Add color</button>
                   <button type="button" class="studio-btn" id="studioAddCurrent">Add current palette</button>
                 </div>
@@ -1459,6 +1571,7 @@
         const CUSTOM_STORAGE_KEY = "palette_explorer_custom_palettes_v1";
         const MAX_CUSTOM_COLORS = 20;
         const PAGE_SIZE = 180;
+        const DEFAULT_PALETTE_NAME = "arbutus";
         const DEFAULT_COLORS = ["#0f1b3f", "#1647a3", "#4a7dde", "#7fa3ea", "#c8d9ff", "#ecf3f9"];
         const VISION_MATRICES = {
           normal: [
@@ -1503,11 +1616,16 @@
         const searchInput = document.getElementById("paletteSearch");
         const optionsList = document.getElementById("paletteOptions");
         const visionMode = document.getElementById("visionMode");
+        const maxColorsFilterInput = document.getElementById("maxColorsFilter");
+        const workbenchColorFilterPicker = document.getElementById("workbenchColorFilterPicker");
+        const workbenchColorFilterHex = document.getElementById("workbenchColorFilterHex");
+        const workbenchColorFilterClear = document.getElementById("workbenchColorFilterClear");
         const paletteHexMeta = document.getElementById("paletteHexMeta");
         const paletteHexList = document.getElementById("paletteHexList");
         const studioMeta = document.getElementById("studioMeta");
         const studioNameInput = document.getElementById("studioName");
         const studioColorInput = document.getElementById("studioColorInput");
+        const studioColorPicker = document.getElementById("studioColorPicker");
         const studioAddColorBtn = document.getElementById("studioAddColor");
         const studioAddCurrentBtn = document.getElementById("studioAddCurrent");
         const studioDraftList = document.getElementById("studioDraftList");
@@ -1539,6 +1657,8 @@
           language: "r",
           vision: "normal",
           query: "",
+          maxColorsFilter: 0,
+          similarColorFilter: "",
           optionLimit: PAGE_SIZE,
           draftName: "",
           draftColors: []
@@ -1617,6 +1737,33 @@
             g: c1.g + (c2.g - c1.g) * t,
             b: c1.b + (c2.b - c1.b) * t
           });
+        }
+
+        function colorDistance(a, b) {
+          const c1 = hexToRgb(a);
+          const c2 = hexToRgb(b);
+          const dr = c1.r - c2.r;
+          const dg = c1.g - c2.g;
+          const db = c1.b - c2.b;
+          return Math.sqrt(dr * dr + dg * dg + db * db);
+        }
+
+        function paletteClosestColorDistance(colors, targetHex) {
+          const paletteColors = Array.isArray(colors) ? colors : [];
+          const target = normalizeHex(targetHex);
+          if (!target || !paletteColors.length) return Number.POSITIVE_INFINITY;
+
+          let best = Number.POSITIVE_INFINITY;
+          paletteColors.forEach((color) => {
+            const hex = normalizeHex(color);
+            if (!hex) return;
+            const distance = colorDistance(hex, target);
+            if (distance < best) {
+              best = distance;
+            }
+          });
+
+          return best;
         }
 
         function transformColorForVision(hex, mode) {
@@ -1720,6 +1867,12 @@
             return;
           }
 
+          const preferred = getPaletteByName(DEFAULT_PALETTE_NAME);
+          if (preferred) {
+            state.selectedName = preferred.name;
+            return;
+          }
+
           state.selectedName = state.palettes[0].name;
         }
 
@@ -1810,17 +1963,31 @@
             .sort((a, b) => a.name.localeCompare(b.name))
             .forEach((palette) => pushUnique({ ...palette, origin: "base" }));
 
-          state.palettes = merged;
+          state.palettes = merged
+            .slice()
+            .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
         }
 
         function filteredPalettes() {
           const query = state.query.trim().toLowerCase();
-          if (!query) return state.palettes;
+          const maxColors = Number(state.maxColorsFilter) > 0 ? Math.floor(Number(state.maxColorsFilter)) : 0;
+          const targetColor = normalizeHex(state.similarColorFilter);
 
-          return state.palettes.filter((palette) => {
+          const filtered = state.palettes.filter((palette) => {
             const haystack = `${palette.name} ${palette.source} ${palette.kind}`.toLowerCase();
-            return haystack.includes(query);
+            if (query && !haystack.includes(query)) return false;
+            if (maxColors > 0 && (palette.palette?.length || 0) > maxColors) return false;
+            return true;
           });
+
+          if (!targetColor) {
+            return filtered;
+          }
+
+          return filtered
+            .map((palette) => ({ palette, distance: paletteClosestColorDistance(palette.palette, targetColor) }))
+            .sort((a, b) => a.distance - b.distance)
+            .map((item) => item.palette);
         }
 
         function getDisplayPaletteColors(palette) {
@@ -2763,6 +2930,49 @@
           refreshPaletteDependentViews();
         }
 
+        function applyWorkbenchFilters() {
+          state.optionLimit = PAGE_SIZE;
+          renderOptions();
+        }
+
+        function setWorkbenchMaxColorsFilter(rawValue) {
+          const parsed = Number(rawValue);
+          const next = Number.isFinite(parsed) && parsed > 0 ? Math.max(1, Math.floor(parsed)) : 0;
+          state.maxColorsFilter = next;
+          if (maxColorsFilterInput && next > 0 && maxColorsFilterInput.value !== String(next)) {
+            maxColorsFilterInput.value = String(next);
+          } else if (maxColorsFilterInput && next === 0 && maxColorsFilterInput.value.trim()) {
+            maxColorsFilterInput.value = "";
+          }
+          applyWorkbenchFilters();
+        }
+
+        function setWorkbenchSimilarColorFilter(rawValue) {
+          const raw = String(rawValue || "").trim();
+          if (!raw) {
+            state.similarColorFilter = "";
+            if (workbenchColorFilterHex) workbenchColorFilterHex.value = "";
+            applyWorkbenchFilters();
+            return;
+          }
+
+          const normalized = normalizeHex(raw);
+          if (!normalized) {
+            state.similarColorFilter = "";
+            applyWorkbenchFilters();
+            return;
+          }
+
+          state.similarColorFilter = normalized;
+          if (workbenchColorFilterHex && workbenchColorFilterHex.value !== normalized.toUpperCase()) {
+            workbenchColorFilterHex.value = normalized.toUpperCase();
+          }
+          if (workbenchColorFilterPicker && workbenchColorFilterPicker.value.toLowerCase() !== normalized) {
+            workbenchColorFilterPicker.value = normalized;
+          }
+          applyWorkbenchFilters();
+        }
+
         function bindEvents() {
           comboButton.addEventListener("click", () => {
             if (dropdown.hidden) {
@@ -2776,6 +2986,43 @@
             state.query = searchInput.value;
             state.optionLimit = PAGE_SIZE;
             renderOptions();
+          });
+
+          maxColorsFilterInput?.addEventListener("input", () => {
+            setWorkbenchMaxColorsFilter(maxColorsFilterInput.value);
+          });
+
+          workbenchColorFilterPicker?.addEventListener("input", () => {
+            setWorkbenchSimilarColorFilter(workbenchColorFilterPicker.value);
+          });
+
+          workbenchColorFilterHex?.addEventListener("input", () => {
+            const raw = workbenchColorFilterHex.value;
+            if (!raw.trim()) {
+              setWorkbenchSimilarColorFilter("");
+              return;
+            }
+            const normalized = normalizeHex(raw);
+            if (normalized) {
+              setWorkbenchSimilarColorFilter(normalized);
+            }
+          });
+
+          workbenchColorFilterHex?.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter") return;
+            event.preventDefault();
+            setWorkbenchSimilarColorFilter(workbenchColorFilterHex.value);
+          });
+
+          workbenchColorFilterHex?.addEventListener("blur", () => {
+            setWorkbenchSimilarColorFilter(workbenchColorFilterHex.value);
+          });
+
+          workbenchColorFilterClear?.addEventListener("click", () => {
+            state.similarColorFilter = "";
+            if (workbenchColorFilterHex) workbenchColorFilterHex.value = "";
+            if (workbenchColorFilterPicker) workbenchColorFilterPicker.value = "#dfe3ce";
+            applyWorkbenchFilters();
           });
 
           visionMode.addEventListener("change", () => {
@@ -2824,6 +3071,11 @@
             event.preventDefault();
             addColorToDraft(studioColorInput.value);
             studioColorInput.value = "";
+          });
+
+          studioColorPicker?.addEventListener("input", () => {
+            if (!studioColorInput) return;
+            studioColorInput.value = studioColorPicker.value.toUpperCase();
           });
 
           studioAddCurrentBtn?.addEventListener("click", () => {
