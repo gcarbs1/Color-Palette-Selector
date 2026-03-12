@@ -3200,7 +3200,7 @@
         async function loadPalettes() {
           let raw;
           try {
-            const response = await fetch(DATA_URL, { cache: "force-cache" });
+            const response = await fetch(DATA_URL, { cache: "no-cache" });
             if (!response.ok) {
               throw new Error(`Could not load ${DATA_URL}: ${response.status}`);
             }
@@ -3468,7 +3468,7 @@
           if (!psCanvas) return;
           let raw;
           try {
-            const resp = await fetch(COORDS_URL, { cache: "force-cache" });
+            const resp = await fetch(COORDS_URL, { cache: "no-cache" });
             if (!resp.ok) throw new Error("fetch failed");
             raw = await resp.json();
           } catch (_) {
