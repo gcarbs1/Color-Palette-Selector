@@ -368,6 +368,24 @@
         overflow: hidden;
       }
 
+      .reference-panel {
+        margin-top: 16px;
+      }
+
+      .reference-body {
+        padding: 16px 18px 18px;
+        color: var(--sub);
+        font-size: 13px;
+        line-height: 1.65;
+      }
+
+      .reference-body a {
+        color: var(--green-m);
+        font-weight: 600;
+        text-decoration-thickness: 1.5px;
+        text-underline-offset: 2px;
+      }
+
       .explorer-head {
         padding: 14px 18px;
         border-bottom: 1px solid var(--border);
@@ -1559,6 +1577,21 @@
         <div class="ps-wrap" id="psWrap">
           <canvas id="psCanvas" class="ps-canvas"></canvas>
           <div id="psTooltip" class="ps-tooltip" hidden></div>
+        </div>
+      </section>
+
+      <section id="reference" class="explorer-panel reference-panel" aria-label="Reference">
+        <div class="explorer-head">
+          <span class="explorer-title">Reference</span>
+        </div>
+        <div class="reference-body">
+          <p>
+            This reference comes from
+            <a href="https://r-graph-gallery.com/color-palette-finder" target="_blank" rel="noopener noreferrer">
+              R Graph Gallery - Color Palette Finder
+            </a>,
+            created by Yan Holtz, a reference name in the field of data visualization.
+          </p>
         </div>
       </section>
     </main>
