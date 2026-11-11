@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Palette Explorer</title>
+    <title>Color Palette Selector</title>
     <meta
       name="description"
-      content="Explore color palettes in a modern and minimal local interface."
+      content="Browse, compare, test, create, and export color palettes for data visualization."
     />
 
     <link
@@ -24,20 +24,20 @@
 
     <style>
       :root {
-        --bg: #f7f6f3;
-        --white: #ffffff;
-        --surface: #fafaf8;
-        --border: #e8e7e3;
-        --border2: #d5d4cf;
-        --text: #0e0e0d;
-        --sub: #6a6a66;
-        --muted: #aeaea9;
-        --faint: #c8c8c3;
-        --green: #152e5e;
-        --green-bg: #f0f4fd;
-        --green-m: #1647a3;
-        --green-lt: #d1ddfa;
-        --green-ring: rgba(22, 71, 163, 0.15);
+        --bg: #f1efe9;
+        --white: #fffefa;
+        --surface: #f7f5ef;
+        --border: #d9d6cd;
+        --border2: #c8c4ba;
+        --text: #111318;
+        --sub: #5f615f;
+        --muted: #858681;
+        --faint: #b2b1aa;
+        --green: #13294b;
+        --green-bg: #edf2fb;
+        --green-m: #2957a4;
+        --green-lt: #cad8f2;
+        --green-ring: rgba(41, 87, 164, 0.15);
         --palette-pill-bg: var(--green-bg);
         --palette-pill-border: #c4d8ff;
         --studio-accent: #1647a3;
@@ -47,8 +47,8 @@
         --amber: #92400e;
         --red: #991b1b;
         --radius-sm: 8px;
-        --radius: 12px;
-        --radius-lg: 18px;
+        --radius: 8px;
+        --radius-lg: 8px;
         --sh-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
         --sh: 0 1px 4px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
         --sh-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
@@ -65,7 +65,7 @@
 
       html {
         scroll-behavior: smooth;
-        scroll-padding-top: 24px;
+        scroll-padding-top: 76px;
       }
 
       body {
@@ -78,14 +78,7 @@
       }
 
       body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background:
-          radial-gradient(ellipse 70% 50% at 15% 10%, rgba(22, 71, 163, 0.05) 0%, transparent 60%),
-          radial-gradient(ellipse 50% 40% at 85% 90%, rgba(22, 71, 163, 0.04) 0%, transparent 60%);
-        pointer-events: none;
-        z-index: 0;
+        display: none;
       }
 
       .hero {
@@ -94,7 +87,7 @@
       }
 
       .hero-inner {
-        max-width: 1080px;
+        max-width: 1160px;
         margin: 0 auto;
         padding: 80px 24px 64px;
         display: grid;
@@ -298,55 +291,87 @@
       }
 
       .page {
-        max-width: 1080px;
+        max-width: 1160px;
         margin: 0 auto;
-        padding: 38px 20px 64px;
+        padding: 56px 24px 80px;
         position: relative;
         z-index: 1;
+        display: grid;
+        gap: 34px;
       }
 
       .explorer-panel {
         background: var(--white);
         border: 1px solid var(--border);
         border-radius: var(--radius-lg);
-        box-shadow: var(--sh);
         overflow: hidden;
       }
 
-      .reference-panel {
-        margin-top: 16px;
+      .section-index {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        background: rgba(255, 254, 250, 0.94);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
       }
 
-      .reference-body {
-        padding: 16px 18px 18px;
+      .section-index-inner {
+        width: min(1160px, calc(100% - 48px));
+        min-height: 52px;
+        margin: 0 auto;
+        display: flex;
+        align-items: stretch;
+        gap: 32px;
+      }
+
+      .section-index a {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
         color: var(--sub);
-        font-size: 13px;
-        line-height: 1.65;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: color 0.15s;
       }
 
-      .reference-body a {
-        color: var(--green-m);
-        font-weight: 600;
-        text-decoration-thickness: 1.5px;
-        text-underline-offset: 2px;
+      .section-index a:hover,
+      .section-index a:focus-visible {
+        color: var(--text);
+        outline: none;
       }
 
       .explorer-head {
-        padding: 14px 18px;
+        padding: 25px 28px 23px;
         border-bottom: 1px solid var(--border);
-        background: var(--surface);
+        background: var(--white);
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         justify-content: space-between;
-        gap: 14px;
+        gap: 24px;
       }
 
-      .explorer-title {
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--muted);
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
+      .section-heading {
+        min-width: 0;
+      }
+
+      .section-heading h2 {
+        font-family: "DM Serif Display", serif;
+        font-size: clamp(25px, 3vw, 34px);
+        font-weight: 400;
+        letter-spacing: -0.025em;
+        line-height: 1.05;
+      }
+
+      .section-heading p {
+        max-width: 640px;
+        margin-top: 7px;
+        color: var(--sub);
+        font-size: 13px;
+        line-height: 1.55;
       }
 
       .count-badge {
@@ -354,10 +379,10 @@
         align-items: center;
         justify-content: center;
         min-height: 28px;
-        border-radius: 999px;
-        border: 1px solid #c6d8ff;
-        background: var(--green-bg);
-        color: var(--text);
+        border-radius: 4px;
+        border: 1px solid var(--green);
+        background: var(--green);
+        color: var(--white);
         padding: 0 11px;
         font-size: 11px;
         font-weight: 700;
@@ -366,18 +391,27 @@
       }
 
       .workbench {
-        padding: 16px;
+        padding: 26px 28px 30px;
+      }
+
+      .control-deck {
+        padding: 18px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
       }
 
       .selector-row {
         display: grid;
         grid-template-columns: minmax(0, 1fr) 240px;
-        gap: 12px;
+        gap: 14px;
         align-items: start;
       }
 
       .workbench-actions {
-        margin-top: 10px;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
         display: flex;
         justify-content: flex-end;
       }
@@ -387,10 +421,10 @@
       }
 
       .workbench-filter-row {
-        margin-top: 10px;
+        margin-top: 14px;
         display: grid;
         grid-template-columns: 220px minmax(0, 1fr);
-        gap: 12px;
+        gap: 14px;
         align-items: end;
       }
 
@@ -398,8 +432,8 @@
         width: 100%;
         min-height: 46px;
         border: 1px solid #d8d7d1;
-        border-radius: 12px;
-        background: #fff;
+        border-radius: 6px;
+        background: var(--white);
         color: var(--text);
         font: 500 13px/1.2 "Outfit", sans-serif;
         padding: 0 11px;
@@ -418,13 +452,19 @@
         flex-wrap: wrap;
       }
 
+      .color-filter-inline .color-picker-box,
+      .color-filter-inline .studio-input,
+      .color-filter-inline .studio-btn {
+        min-height: 46px;
+      }
+
       .color-picker-box {
         width: 44px;
         min-width: 44px;
         height: 40px;
         border: 1px solid #d8d7d1;
-        border-radius: 10px;
-        background: #fff;
+        border-radius: 6px;
+        background: var(--white);
         padding: 3px;
         cursor: pointer;
       }
@@ -467,7 +507,7 @@
         width: 100%;
         border: 1px solid #d8d7d1;
         background: #fff;
-        border-radius: 12px;
+        border-radius: 6px;
         min-height: 46px;
         padding: 8px 12px;
         display: flex;
@@ -479,8 +519,10 @@
         transition: border-color 0.15s, box-shadow 0.15s;
       }
 
-      .combo-button:hover {
+      .combo-button:hover,
+      .combo-button:focus-visible {
         border-color: #b9b8b0;
+        outline: none;
       }
 
       .combo-button[aria-expanded="true"] {
@@ -533,8 +575,8 @@
         left: 0;
         right: 0;
         border: 1px solid var(--border2);
-        border-radius: 12px;
-        background: #fff;
+        border-radius: 6px;
+        background: var(--white);
         box-shadow: var(--sh-md);
         overflow: hidden;
       }
@@ -574,8 +616,10 @@
         border-bottom: none;
       }
 
-      .option-item:hover {
+      .option-item:hover,
+      .option-item:focus-visible {
         background: #f8f8f6;
+        outline: none;
       }
 
       .option-item.active {
@@ -612,17 +656,17 @@
       .control-label {
         font-size: 10px;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
-        font-weight: 700;
-        color: var(--muted);
+        letter-spacing: 0.11em;
+        font-weight: 800;
+        color: var(--sub);
       }
 
       .control-select {
         width: 100%;
         min-height: 46px;
         border: 1px solid #d8d7d1;
-        border-radius: 12px;
-        background: #fff;
+        border-radius: 6px;
+        background: var(--white);
         color: var(--text);
         font: 500 13px/1.2 "Outfit", sans-serif;
         padding: 0 11px;
@@ -635,25 +679,23 @@
       }
 
       .plot-grid {
-        margin-top: 16px;
+        margin-top: 22px;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
+        gap: 14px;
       }
 
       .plot-card {
         border: 1px solid var(--border);
-        border-radius: 12px;
-        background: #fff;
-        padding: 10px;
+        border-radius: 6px;
+        background: var(--surface);
+        padding: 14px;
       }
 
       .plot-title {
-        font: 700 12px/1.2 "Outfit", sans-serif;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: var(--muted);
-        margin-bottom: 8px;
+        font: 700 13px/1.2 "Outfit", sans-serif;
+        color: var(--text);
+        margin-bottom: 11px;
       }
 
       .plot-svg {
@@ -661,13 +703,13 @@
         height: auto;
         aspect-ratio: 16 / 10;
         display: block;
-        border: 1px solid #efeee9;
-        border-radius: 8px;
-        background: linear-gradient(180deg, #ffffff 0%, #fbfaf7 100%);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--white);
       }
 
       .palette-hex-body {
-        padding: 14px 16px 16px;
+        padding: 24px 28px 28px;
         display: grid;
         gap: 10px;
       }
@@ -680,31 +722,31 @@
       .palette-hex-list {
         list-style: none;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
-        gap: 8px;
+        grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+        gap: 10px;
       }
 
       .palette-hex-item {
-        min-height: 36px;
-        padding: 7px 9px;
+        min-height: 52px;
+        padding: 9px 11px;
         border: 1px solid var(--border);
-        border-radius: 10px;
-        background: #fff;
+        border-radius: 6px;
+        background: var(--surface);
         display: flex;
         align-items: center;
         gap: 8px;
       }
 
       .palette-hex-swatch {
-        width: 16px;
-        height: 16px;
-        border-radius: 4px;
+        width: 28px;
+        height: 28px;
+        border-radius: 3px;
         border: 1px solid rgba(0, 0, 0, 0.14);
         flex: 0 0 auto;
       }
 
       .palette-hex-code {
-        font: 600 12px/1 "Outfit", sans-serif;
+        font: 700 12px/1 "Outfit", sans-serif;
         letter-spacing: 0.02em;
         color: var(--text);
       }
@@ -715,7 +757,7 @@
       }
 
       .studio-body {
-        padding: 14px 16px 16px;
+        padding: 24px 28px 28px;
         display: grid;
         gap: 12px;
       }
@@ -728,16 +770,16 @@
       .studio-grid {
         display: grid;
         grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-        gap: 12px;
+        gap: 16px;
       }
 
       .studio-card {
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        background: #fff;
-        padding: 12px;
+        background: var(--surface);
+        padding: 18px;
         display: grid;
-        gap: 10px;
+        gap: 14px;
       }
 
       .studio-field {
@@ -748,7 +790,7 @@
       .studio-input {
         width: 100%;
         border: 1px solid #d8d7d1;
-        border-radius: 10px;
+        border-radius: 6px;
         min-height: 40px;
         padding: 0 11px;
         font: 500 13px/1.2 "Outfit", sans-serif;
@@ -774,9 +816,9 @@
 
       .studio-btn {
         border: 1px solid #d8d7d1;
-        border-radius: 10px;
-        min-height: 34px;
-        padding: 0 10px;
+        border-radius: 5px;
+        min-height: 38px;
+        padding: 0 12px;
         font: 600 12px/1 "Outfit", sans-serif;
         color: var(--text);
         background: #fff;
@@ -784,21 +826,24 @@
         transition: border-color 0.15s, background 0.15s, color 0.15s;
       }
 
-      .studio-btn:hover {
+      .studio-btn:hover,
+      .studio-btn:focus-visible {
         border-color: #b9b8b0;
         background: #f8f8f6;
+        outline: none;
       }
 
       .studio-btn.primary {
-        background: var(--palette-pill-bg);
-        border-color: var(--palette-pill-border);
-        color: #0e0e0d;
+        background: var(--green);
+        border-color: var(--green);
+        color: var(--white);
       }
 
-      .studio-btn.primary:hover {
-        background: var(--palette-pill-bg);
-        border-color: var(--palette-pill-border);
-        color: #0e0e0d;
+      .studio-btn.primary:hover,
+      .studio-btn.primary:focus-visible {
+        background: var(--green-m);
+        border-color: var(--green-m);
+        color: var(--white);
       }
 
       .studio-btn.danger {
@@ -889,8 +934,9 @@
 
       .studio-palette-item {
         border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 9px;
+        border-radius: 6px;
+        padding: 11px;
+        background: var(--white);
         display: grid;
         gap: 8px;
       }
@@ -948,6 +994,10 @@
           margin-inline: auto;
         }
 
+        .hero-profile {
+          justify-content: center;
+        }
+
         .palette-pill {
           margin-inline: auto;
         }
@@ -989,11 +1039,40 @@
         }
 
         .page {
-          padding: 28px 16px 48px;
+          padding: 34px 16px 54px;
+          gap: 22px;
+        }
+
+        .section-index-inner {
+          width: 100%;
+          min-height: 48px;
+          padding: 0 16px;
+          gap: 22px;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+
+        .section-index-inner::-webkit-scrollbar {
+          display: none;
+        }
+
+        .explorer-head {
+          padding: 21px 18px 19px;
+          display: grid;
+          align-items: start;
+          gap: 14px;
+        }
+
+        .section-heading h2 {
+          font-size: 27px;
         }
 
         .workbench {
-          padding: 12px;
+          padding: 18px;
+        }
+
+        .control-deck {
+          padding: 14px;
         }
 
         .workbench-actions {
@@ -1020,8 +1099,18 @@
           max-width: none;
         }
 
+        .studio-body,
+        .palette-hex-body {
+          padding: 18px;
+        }
+
         .studio-inline .studio-btn {
           flex: 1 1 100%;
+        }
+
+        .profile-name {
+          width: 100%;
+          margin-right: 0;
         }
       }
 
@@ -1033,11 +1122,11 @@
     }
 
     .ps-tool-btn {
-      height: 26px;
-      min-width: 26px;
-      padding: 0 8px;
+      height: 36px;
+      min-width: 36px;
+      padding: 0 10px;
       border: 1px solid var(--border2);
-      border-radius: var(--radius-sm);
+      border-radius: 5px;
       background: var(--white);
       color: var(--sub);
       font-size: 13px;
@@ -1048,16 +1137,19 @@
       line-height: 1;
     }
 
-    .ps-tool-btn:hover {
+    .ps-tool-btn:hover,
+    .ps-tool-btn:focus-visible {
       background: var(--green-bg);
       color: var(--green-m);
       border-color: var(--green-lt);
+      outline: none;
     }
 
     .ps-wrap {
       position: relative;
-      background: var(--bg);
+      background: var(--surface);
       overflow: hidden;
+      border-top: 0;
     }
 
     .ps-canvas {
@@ -1280,96 +1372,110 @@
       </div>
     </header>
 
+    <nav class="section-index" aria-label="Tool sections">
+      <div class="section-index-inner">
+        <a href="#explore">Palette Workbench</a>
+        <a href="#palette-hex">Palette Hex Values</a>
+        <a href="#palette-studio">Palette Studio</a>
+        <a href="#palette-space">Palette Space</a>
+      </div>
+    </nav>
+
     <main class="page">
       <section id="explore" class="explorer-panel" aria-label="Palette explorer">
         <div class="explorer-head">
-          <span class="explorer-title">Palette Workbench</span>
+          <div class="section-heading">
+            <h2>Palette Workbench</h2>
+            <p>Select a palette, refine the catalog, and preview its behavior across nine common chart types.</p>
+          </div>
           <span id="paletteCountBadge" class="count-badge">Loading...</span>
         </div>
 
         <div class="workbench">
-          <div class="selector-row">
-            <div class="combo-wrap" id="paletteComboWrap">
-              <label class="control-label" for="paletteComboButton">Palette</label>
-              <button
-                id="paletteComboButton"
-                class="combo-button"
-                type="button"
-                role="combobox"
-                aria-expanded="false"
-                aria-haspopup="listbox"
-                aria-controls="paletteOptions"
-              >
-                <div class="combo-selection">
-                  <span id="comboName" class="combo-name">Loading...</span>
-                  <div id="comboSwatches" class="swatch-row" aria-hidden="true"></div>
+          <div class="control-deck">
+            <div class="selector-row">
+              <div class="combo-wrap" id="paletteComboWrap">
+                <label class="control-label" for="paletteComboButton">Palette</label>
+                <button
+                  id="paletteComboButton"
+                  class="combo-button"
+                  type="button"
+                  role="combobox"
+                  aria-expanded="false"
+                  aria-haspopup="listbox"
+                  aria-controls="paletteOptions"
+                >
+                  <div class="combo-selection">
+                    <span id="comboName" class="combo-name">Loading...</span>
+                    <div id="comboSwatches" class="swatch-row" aria-hidden="true"></div>
+                  </div>
+                  <span class="combo-chevron" aria-hidden="true">▾</span>
+                </button>
+
+                <div id="paletteDropdown" class="combo-dropdown" hidden>
+                  <input
+                    id="paletteSearch"
+                    class="search-input"
+                    type="text"
+                    placeholder="Search palette (e.g. ghoststory, viridis, set2)"
+                    autocomplete="off"
+                  />
+                  <div id="paletteOptions" class="option-list" role="listbox" aria-label="Palette list"></div>
                 </div>
-                <span class="combo-chevron" aria-hidden="true">▾</span>
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="visionMode">Vision Simulation</label>
+                <select id="visionMode" class="control-select">
+                  <option value="normal">Normal</option>
+                  <option value="deuteranopia">Deuteranopia</option>
+                  <option value="protanopia">Protanopia</option>
+                  <option value="tritanopia">Tritanopia</option>
+                  <option value="achromatopsia">Achromatopsia</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="workbench-filter-row">
+              <div class="control-group">
+                <label class="control-label" for="maxColorsFilter">Max Colors In Palette</label>
+                <input
+                  id="maxColorsFilter"
+                  class="control-number"
+                  type="number"
+                  min="1"
+                  step="1"
+                  inputmode="numeric"
+                />
+              </div>
+
+              <div class="control-group">
+                <label class="control-label" for="workbenchColorFilterHex">Similar Color (HEX)</label>
+                <div class="color-filter-inline">
+                  <input
+                    id="workbenchColorFilterPicker"
+                    class="color-picker-box"
+                    type="color"
+                    value="#dfe3ce"
+                    aria-label="Pick filter color"
+                  />
+                  <input
+                    id="workbenchColorFilterHex"
+                    class="studio-input color-filter-hex"
+                    type="text"
+                    placeholder="#DFE3CE"
+                    autocomplete="off"
+                  />
+                  <button type="button" class="studio-btn" id="workbenchColorFilterClear">Clear</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="workbench-actions">
+              <button type="button" class="studio-btn primary workbench-export-btn" id="workbenchExportSelected">
+                Export selected JSON
               </button>
-
-              <div id="paletteDropdown" class="combo-dropdown" hidden>
-                <input
-                  id="paletteSearch"
-                  class="search-input"
-                  type="text"
-                  placeholder="Search palette (e.g. ghoststory, viridis, set2)"
-                  autocomplete="off"
-                />
-                <div id="paletteOptions" class="option-list" role="listbox" aria-label="Palette list"></div>
-              </div>
             </div>
-
-            <div class="control-group">
-              <label class="control-label" for="visionMode">Vision Simulation</label>
-              <select id="visionMode" class="control-select">
-                <option value="normal">Normal</option>
-                <option value="deuteranopia">Deuteranopia</option>
-                <option value="protanopia">Protanopia</option>
-                <option value="tritanopia">Tritanopia</option>
-                <option value="achromatopsia">Achromatopsia</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="workbench-filter-row">
-            <div class="control-group">
-              <label class="control-label" for="maxColorsFilter">Max Colors In Palette</label>
-              <input
-                id="maxColorsFilter"
-                class="control-number"
-                type="number"
-                min="1"
-                step="1"
-                inputmode="numeric"
-              />
-            </div>
-
-            <div class="control-group">
-              <label class="control-label" for="workbenchColorFilterHex">Similar Color (HEX)</label>
-              <div class="color-filter-inline">
-                <input
-                  id="workbenchColorFilterPicker"
-                  class="color-picker-box"
-                  type="color"
-                  value="#dfe3ce"
-                  aria-label="Pick filter color"
-                />
-                <input
-                  id="workbenchColorFilterHex"
-                  class="studio-input color-filter-hex"
-                  type="text"
-                  placeholder="#DFE3CE"
-                  autocomplete="off"
-                />
-                <button type="button" class="studio-btn" id="workbenchColorFilterClear">Clear</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="workbench-actions">
-            <button type="button" class="studio-btn primary workbench-export-btn" id="workbenchExportSelected">
-              Export selected JSON
-            </button>
           </div>
 
           <div class="plot-grid">
@@ -1415,7 +1521,10 @@
 
       <section id="palette-hex" class="explorer-panel" aria-label="Palette hex values">
         <div class="explorer-head">
-          <span class="explorer-title">Palette Hex Values</span>
+          <div class="section-heading">
+            <h2>Palette Hex Values</h2>
+            <p>Review the active palette as a set of ready-to-use HEX values.</p>
+          </div>
           <span id="paletteHexMeta" class="count-badge">Loading...</span>
         </div>
         <div class="palette-hex-body">
@@ -1427,7 +1536,10 @@
 
       <section id="palette-studio" class="explorer-panel" aria-label="Palette creation studio">
         <div class="explorer-head">
-          <span class="explorer-title">Palette Studio</span>
+          <div class="section-heading">
+            <h2>Palette Studio</h2>
+            <p>Combine colors, save custom sets locally, and export them as JSON.</p>
+          </div>
           <span id="studioMeta" class="count-badge">0 saved</span>
         </div>
         <div class="studio-body">
@@ -1487,33 +1599,29 @@
 
       <section id="palette-space" class="explorer-panel" aria-label="Palette similarity map">
         <div class="explorer-head">
-          <span class="explorer-title">Palette Space</span>
+          <div class="section-heading">
+            <h2>Palette Space</h2>
+            <p>Navigate the two-dimensional embedding to find palettes with related color structures.</p>
+          </div>
           <div class="ps-toolbar">
-            <button type="button" class="ps-tool-btn" id="psZoomOut" title="Zoom out">−</button>
+            <button type="button" class="ps-tool-btn" id="psZoomOut" title="Zoom out" aria-label="Zoom out">−</button>
             <button type="button" class="ps-tool-btn" id="psZoomReset" title="Reset view">Reset</button>
-            <button type="button" class="ps-tool-btn" id="psZoomIn" title="Zoom in">+</button>
+            <button type="button" class="ps-tool-btn" id="psZoomIn" title="Zoom in" aria-label="Zoom in">+</button>
           </div>
         </div>
         <div class="ps-wrap" id="psWrap">
-          <canvas id="psCanvas" class="ps-canvas"></canvas>
+          <canvas
+            id="psCanvas"
+            class="ps-canvas"
+            role="img"
+            aria-label="Two-dimensional similarity map of the available color palettes."
+          >
+            Interactive similarity map of the available color palettes.
+          </canvas>
           <div id="psTooltip" class="ps-tooltip" hidden></div>
         </div>
       </section>
 
-      <section id="reference" class="explorer-panel reference-panel" aria-label="Reference">
-        <div class="explorer-head">
-          <span class="explorer-title">Reference</span>
-        </div>
-        <div class="reference-body">
-          <p>
-            This reference comes from
-            <a href="https://r-graph-gallery.com/color-palette-finder" target="_blank" rel="noopener noreferrer">
-              R Graph Gallery - Color Palette Finder
-            </a>,
-            created by Yan Holtz, a reference name in the field of data visualization.
-          </p>
-        </div>
-      </section>
     </main>
 
     <script>
@@ -2065,23 +2173,13 @@
 
         function resetCountBadgeTheme() {
           if (!countBadge) return;
-          countBadge.style.background = "var(--green-bg)";
-          countBadge.style.borderColor = "#c6d8ff";
-          countBadge.style.color = "var(--text)";
+          countBadge.style.removeProperty("background");
+          countBadge.style.removeProperty("border-color");
+          countBadge.style.removeProperty("color");
         }
 
-        function applyCountBadgeTheme(colors) {
-          if (!countBadge) return;
-          if (!colors.length) {
-            resetCountBadgeTheme();
-            return;
-          }
-
-          const base = colors[0];
-          const accent = colors[Math.min(1, colors.length - 1)] || base;
-          countBadge.style.background = mixColor(base, "#ffffff", 0.84);
-          countBadge.style.borderColor = mixColor(accent, "#ffffff", 0.56);
-          countBadge.style.color = "var(--text)";
+        function applyCountBadgeTheme() {
+          resetCountBadgeTheme();
         }
 
         function resetHeroLogoTheme() {
