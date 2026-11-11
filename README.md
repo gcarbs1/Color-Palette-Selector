@@ -17,6 +17,9 @@ Interactive web application for exploring color palettes, previewing them across
 .
 ├── index.html
 ├── requirements.txt
+├── html/
+│   ├── styles.css
+│   └── app.js
 ├── data/
 │   ├── palettes.json
 │   ├── palettes.js
